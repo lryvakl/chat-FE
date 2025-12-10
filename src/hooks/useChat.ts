@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { socket } from "../api/socket";
 import { useEffect } from "react";
 import { addMessage } from "../store/chatSlice";
-import type { Message } from "../utils/interfaces";
+import type { Message, ServerError } from "../utils/interfaces";
 import type { RootState } from "../store";
 import { SocketEvent } from "../utils/enums";
 
@@ -17,21 +17,30 @@ export const useChat = () => {
       dispatch(addMessage(message));
     };
 
+    const handleError = (error: Error | ServerError) => {
+      console.error(error.message);
+    };
+
     socket.on(SocketEvent.ReceiveMessage, handleReceiveMessage);
+
+    socket.on(SocketEvent.ConnectionError, handleError);
+    socket.on(SocketEvent.Exeption, handleError);
 
     return () => {
       socket.off(SocketEvent.ReceiveMessage, handleReceiveMessage);
+      socket.off(SocketEvent.ConnectionError, handleError);
+      socket.off(SocketEvent.Exeption, handleError);
       socket.disconnect();
     };
   }, [dispatch]);
 
   const sendMessage = (text: string) => {
     if (currentUser) {
-      const messagePayloag = {
+      const messagePayload = {
         user: currentUser,
         text: text,
       };
-      socket.emit(SocketEvent.SendMessage, messagePayloag);
+      socket.emit(SocketEvent.SendMessage, messagePayload);
     }
   };
 

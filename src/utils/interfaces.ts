@@ -13,3 +13,8 @@ export interface ChatState {
   currentUser: string;
   isConnected: boolean;
 }
+
+export interface ServerError {
+  status?: string;
+  message: string;
+}
