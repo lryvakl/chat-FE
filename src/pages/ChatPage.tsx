@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useChat } from "../hooks/useChat";
 import { useEffect } from "react";
+import { useChat } from "../hooks/useChat";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
 

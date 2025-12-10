@@ -1,17 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-
-export interface Message {
-  text: string;
-  user: string;
-  createdAt: string;
-}
-
-export interface ChatState {
-  messages: Message[];
-  currentUser: string;
-  isConnected: boolean;
-}
+import type { Message, ChatState } from "../utils/interfaces";
 
 const initialState: ChatState = {
   messages: [],

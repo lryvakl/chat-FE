@@ -2,8 +2,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { socket } from "../api/socket";
 import { useEffect } from "react";
 import { addMessage } from "../store/chatSlice";
-import type { Message } from "../store/chatSlice";
+import type { Message } from "../utils/interfaces";
 import type { RootState } from "../store";
+import { SocketEvent } from "../utils/enums";
 
 export const useChat = () => {
   const dispatch = useDispatch();
@@ -16,10 +17,10 @@ export const useChat = () => {
       dispatch(addMessage(message));
     };
 
-    socket.on("receiveMessage", handleReceiveMessage);
+    socket.on(SocketEvent.ReceiveMessage, handleReceiveMessage);
 
     return () => {
-      socket.off("receiveMessage", handleReceiveMessage);
+      socket.off(SocketEvent.ReceiveMessage, handleReceiveMessage);
       socket.disconnect();
     };
   }, [dispatch]);
@@ -30,8 +31,9 @@ export const useChat = () => {
         user: currentUser,
         text: text,
       };
-      socket.emit("sendMessage", messagePayloag);
+      socket.emit(SocketEvent.SendMessage, messagePayloag);
     }
   };
+
   return { sendMessage, currentUser };
 };

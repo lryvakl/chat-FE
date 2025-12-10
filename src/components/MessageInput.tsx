@@ -1,11 +1,8 @@
 import { Button, TextField } from "@mui/material";
 import { useState } from "react";
+import type { MessageInputProps } from "../utils/interfaces";
 
-interface Props {
-  onSendMessage: (text: string) => void;
-}
-
-export const MessageInput = ({ onSendMessage }: Props) => {
+export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
   const [text, setText] = useState("");
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();

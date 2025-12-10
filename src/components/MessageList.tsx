@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../store";
 import { List } from "@mui/material";
+
 export const MessageList = () => {
   const messages = useSelector((state: RootState) => state.chat.messages);
   const currentUser = useSelector((state: RootState) => state.chat.currentUser);
