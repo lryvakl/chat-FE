@@ -1,10 +1,16 @@
-import { TextField, Box, IconButton } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
 import { useState } from "react";
+import { TextField, Box, IconButton, useTheme, alpha } from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
 import type { MessageInputProps } from "../utils/interfaces";
 
 export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
   const [text, setText] = useState("");
+  const theme = useTheme();
+
+  const MAX_LENGTH = 800;
+  const currentLength = text.length;
+  const isLimitReached = currentLength >= MAX_LENGTH;
+
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (text.trim()) {
@@ -18,6 +24,12 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const getHelperText = () => {
+    if (isLimitReached)
+      return `Character limit reached (${text.length}/${MAX_LENGTH})`;
+    return `${text.length}/${MAX_LENGTH}`;
   };
 
   return (
@@ -41,10 +53,24 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
         maxRows={4}
         size="small"
         autoComplete="off"
+        error={isLimitReached}
+        helperText={getHelperText()}
+        inputProps={{
+          maxLength: MAX_LENGTH,
+        }}
+        FormHelperTextProps={{
+          sx: {
+            textAlign: isLimitReached ? "left" : "right",
+            marginLeft: 0,
+            color: isLimitReached ? "error.main" : "text.secondary",
+          },
+        }}
         sx={{
           "& .MuiOutlinedInput-root": {
             borderRadius: "20px",
-            backgroundColor: "#f9f9f9",
+            backgroundColor: isLimitReached
+              ? alpha(theme.palette.error.main, 0.1)
+              : theme.palette.action.hover,
           },
         }}
       />
@@ -54,7 +80,7 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
         color="primary"
         disabled={!text.trim()}
         sx={{
-          bgcolor: text.trim() ? "primary.main" : "grey.300",
+          bgcolor: text.trim() ? "primary.main" : "action.disabledBackground",
           color: "white",
           "&:hover": {
             bgcolor: "primary.dark",
