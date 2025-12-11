@@ -5,3 +5,9 @@ export enum SocketEvent {
   ConnectionError = "connect_error",
   Exeption = "exeption",
 }
+
+export enum Room {
+  General = "General",
+  Tech = "Tech",
+  Random = "Random"
+}

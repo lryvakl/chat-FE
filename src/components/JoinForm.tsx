@@ -15,6 +15,7 @@ import { useState } from "react";
 import { joinChat } from "../store/chatSlice";
 import { useNavigate } from "react-router-dom";
 import type { JoinChatPayload } from "../utils/interfaces";
+import { Room } from "../utils/enums";
 
 export const JoinForm = () => {
   const [name, setName] = useState("");
@@ -78,9 +79,9 @@ export const JoinForm = () => {
                 label="Room"
                 onChange={(e) => setRoom(e.target.value)}
               >
-                <MenuItem value="General">General</MenuItem>
-                <MenuItem value="Tech">Tech Talk</MenuItem>
-                <MenuItem value="Random">Random</MenuItem>
+                <MenuItem value={Room.General}>{Room.General}</MenuItem>
+                <MenuItem value={Room.Tech}>{Room.Tech}</MenuItem>
+                <MenuItem value={Room.Random}>{Room.Random}</MenuItem>
               </Select>
             </FormControl>
 
