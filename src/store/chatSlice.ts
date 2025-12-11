@@ -1,6 +1,7 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { Message, ChatState, JoinChatPayload } from "../utils/interfaces";
+import { chatApi } from "../api/chatApi";
 
 const initialState: ChatState = {
   messages: [],
@@ -8,6 +9,14 @@ const initialState: ChatState = {
   currentRoom: "",
   isConnected: false,
 };
+
+export const fetchMessages = createAsyncThunk(
+  "chat/fetchMessages",
+  async () => {
+    const response = await chatApi.getRecentlyMessages();
+    return response;
+  }
+);
 
 const chatSlice = createSlice({
   name: "chat",
@@ -33,6 +42,15 @@ const chatSlice = createSlice({
     addMessage: (state, action: PayloadAction<Message>) => {
       state.messages.push(action.payload);
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchMessages.fulfilled, (state, action) => {
+        state.messages = action.payload;
+      })
+      .addCase(fetchMessages.rejected, (state, action) => {
+        console.error(action.error);
+      });
   },
 });
 

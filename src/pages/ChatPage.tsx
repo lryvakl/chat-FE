@@ -13,7 +13,7 @@ import { useDispatch } from "react-redux";
 import { useChat } from "../hooks/useChat";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
-import { leaveChat } from "../store/chatSlice";
+import { leaveChat, fetchMessages } from "../store/chatSlice";
 
 const ChatPage = () => {
   const { sendMessage, currentUser } = useChat();
@@ -25,6 +25,12 @@ const ChatPage = () => {
       navigate("/");
     }
   }, [currentUser, navigate]);
+
+  useEffect(() => {
+    if (currentUser) {
+      (dispatch as any)(fetchMessages());
+    }
+  }, [currentUser, dispatch]);
 
   const handleLeave = () => {
     dispatch(leaveChat());
