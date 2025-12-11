@@ -7,7 +7,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<JoinForm />} />
-      <Route path="/chat" element={<ChatPage />} />
+      <Route path="/chat/:room" element={<ChatPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

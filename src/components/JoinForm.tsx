@@ -26,12 +26,12 @@ export const JoinForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const payload: JoinChatPayload = {
-      name: name,
-      room: room,
+      name,
+      room,
     };
     if (name.trim()) {
       dispatch(joinChat(payload));
-      navigate("/chat");
+      navigate(`/chat/${room}`);
     }
   };
 

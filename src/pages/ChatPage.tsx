@@ -7,7 +7,7 @@ import {
   Paper,
   Button,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useChat } from "../hooks/useChat";
@@ -17,6 +17,7 @@ import { leaveChat, fetchMessages } from "../store/chatSlice";
 
 const ChatPage = () => {
   const { sendMessage, currentUser } = useChat();
+  const { room } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -27,10 +28,10 @@ const ChatPage = () => {
   }, [currentUser, navigate]);
 
   useEffect(() => {
-    if (currentUser) {
-      (dispatch as any)(fetchMessages());
+    if (room) {
+      (dispatch as any)(fetchMessages(room));
     }
-  }, [currentUser, dispatch]);
+  }, [room, dispatch]);
 
   const handleLeave = () => {
     dispatch(leaveChat());

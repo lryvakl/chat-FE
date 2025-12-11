@@ -12,8 +12,8 @@ const initialState: ChatState = {
 
 export const fetchMessages = createAsyncThunk(
   "chat/fetchMessages",
-  async () => {
-    const response = await chatApi.getRecentlyMessages();
+  async (room: string) => {
+    const response = await chatApi.getRecentlyMessages(room);
     return response;
   }
 );
