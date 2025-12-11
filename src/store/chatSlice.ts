@@ -16,6 +16,14 @@ const chatSlice = createSlice({
     joinChat: (state, action: PayloadAction<JoinChatPayload>) => {
       state.currentUser = action.payload.name;
       state.currentRoom = action.payload.room;
+      state.messages = [];
+    },
+
+    leaveChat: (state) => {
+      state.currentUser = "";
+      state.currentRoom = "";
+      state.messages = [];
+      state.isConnected = false;
     },
 
     setConnectionStatus: (state, action: PayloadAction<boolean>) => {
@@ -28,5 +36,6 @@ const chatSlice = createSlice({
   },
 });
 
-export const { joinChat, setConnectionStatus, addMessage } = chatSlice.actions;
+export const { joinChat, leaveChat, setConnectionStatus, addMessage } =
+  chatSlice.actions;
 export default chatSlice.reducer;

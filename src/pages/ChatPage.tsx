@@ -9,12 +9,15 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { useChat } from "../hooks/useChat";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
+import { leaveChat } from "../store/chatSlice";
 
 const ChatPage = () => {
   const { sendMessage, currentUser } = useChat();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +27,7 @@ const ChatPage = () => {
   }, [currentUser, navigate]);
 
   const handleLeave = () => {
+    dispatch(leaveChat());
     navigate("/");
   };
 
