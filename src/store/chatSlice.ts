@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { Message, ChatState } from "../utils/interfaces";
+import type { Message, ChatState, JoinChatPayload } from "../utils/interfaces";
 
 const initialState: ChatState = {
   messages: [],
   currentUser: "",
+  currentRoom: "",
   isConnected: false,
 };
 
@@ -12,8 +13,9 @@ const chatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
-    joinChat: (state, action: PayloadAction<string>) => {
-      state.currentUser = action.payload;
+    joinChat: (state, action: PayloadAction<JoinChatPayload>) => {
+      state.currentUser = action.payload.name;
+      state.currentRoom = action.payload.room;
     },
 
     setConnectionStatus: (state, action: PayloadAction<boolean>) => {

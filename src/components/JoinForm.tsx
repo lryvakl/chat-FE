@@ -5,21 +5,32 @@ import {
   Stack,
   Button,
   Typography,
+  FormControl,
+  MenuItem,
+  Select,
+  InputLabel,
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { joinChat } from "../store/chatSlice";
 import { useNavigate } from "react-router-dom";
+import type { JoinChatPayload } from "../utils/interfaces";
 
 export const JoinForm = () => {
   const [name, setName] = useState("");
+  const [room, setRoom] = useState("General");
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const payload: JoinChatPayload = {
+      name: name,
+      room: room,
+    };
     if (name.trim()) {
-      dispatch(joinChat(name));
+      dispatch(joinChat(payload));
       navigate("/chat");
     }
   };
@@ -58,6 +69,20 @@ export const JoinForm = () => {
               autoFocus
               placeholder="Nickname"
             />
+
+            <FormControl fullWidth>
+              <InputLabel id="room-select-label">Room</InputLabel>
+              <Select
+                labelId="room-select-label"
+                value={room}
+                label="Room"
+                onChange={(e) => setRoom(e.target.value)}
+              >
+                <MenuItem value="General">General</MenuItem>
+                <MenuItem value="Tech">Tech Talk</MenuItem>
+                <MenuItem value="Random">Random</MenuItem>
+              </Select>
+            </FormControl>
 
             <Button
               type="submit"

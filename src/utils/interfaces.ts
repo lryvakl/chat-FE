@@ -5,13 +5,20 @@ export interface MessageInputProps {
 export interface Message {
   text: string;
   user: string;
+  room: string;
   createdAt: string;
 }
 
 export interface ChatState {
   messages: Message[];
   currentUser: string;
+  currentRoom: string;
   isConnected: boolean;
+}
+
+export interface JoinChatPayload {
+  name: string;
+  room: string;
 }
 
 export interface ServerError {

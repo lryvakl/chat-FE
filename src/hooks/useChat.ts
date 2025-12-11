@@ -9,9 +9,16 @@ import { SocketEvent } from "../utils/enums";
 export const useChat = () => {
   const dispatch = useDispatch();
   const currentUser = useSelector((state: RootState) => state.chat.currentUser);
+  const currentRoom = useSelector((state: RootState) => state.chat.currentRoom);
 
   useEffect(() => {
     socket.connect();
+    if (currentUser && currentRoom) {
+      socket.emit(SocketEvent.JoinRoom, {
+        user: currentUser,
+        room: currentRoom,
+      });
+    }
 
     const handleReceiveMessage = (message: Message) => {
       dispatch(addMessage(message));
@@ -32,17 +39,18 @@ export const useChat = () => {
       socket.off(SocketEvent.Exeption, handleError);
       socket.disconnect();
     };
-  }, [dispatch]);
+  }, [dispatch, currentUser, currentRoom]);
 
   const sendMessage = (text: string) => {
     if (currentUser) {
       const messagePayload = {
         user: currentUser,
         text: text,
+        room: currentRoom,
       };
       socket.emit(SocketEvent.SendMessage, messagePayload);
     }
   };
 
-  return { sendMessage, currentUser };
+  return { sendMessage, currentUser, currentRoom };
 };
