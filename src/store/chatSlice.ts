@@ -8,6 +8,8 @@ const initialState: ChatState = {
   currentUser: "",
   currentRoom: "",
   isConnected: false,
+  isLoading: false,
+  error: null,
 };
 
 export const fetchMessages = createAsyncThunk(
@@ -26,6 +28,8 @@ const chatSlice = createSlice({
       state.currentUser = action.payload.name;
       state.currentRoom = action.payload.room;
       state.messages = [];
+      state.error = null;
+      state.isLoading = false;
     },
 
     leaveChat: () => {
@@ -42,10 +46,17 @@ const chatSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchMessages.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(fetchMessages.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.messages = action.payload;
       })
       .addCase(fetchMessages.rejected, (state, action) => {
+        state.isLoading = true;
+        state.error = action.error.message || "Something went wrong";
         console.error(action.error);
       });
   },

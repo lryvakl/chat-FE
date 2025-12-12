@@ -6,18 +6,22 @@ import {
   Container,
   Paper,
   Button,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useChat } from "../hooks/useChat";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
+import type { RootState } from "../store";
 import { leaveChat, fetchMessages } from "../store/chatSlice";
 
 const ChatPage = () => {
   const { sendMessage, currentUser } = useChat();
   const { room } = useParams();
+  const { isLoading, error } = useSelector((state: RootState) => state.chat);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -37,6 +41,25 @@ const ChatPage = () => {
     dispatch(leaveChat());
     navigate("/");
   };
+
+  if (!currentUser) return null;
+
+  if (isLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return <Alert severity="error">{error}</Alert>;
+  }
 
   return (
     <Box

@@ -14,6 +14,8 @@ export interface ChatState {
   currentUser: string;
   currentRoom: string;
   isConnected: boolean;
+  isLoading: boolean;
+  error: string | null;
 }
 
 export interface JoinChatPayload {
