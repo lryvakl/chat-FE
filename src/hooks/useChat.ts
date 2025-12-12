@@ -44,7 +44,7 @@ export const useChat = () => {
   const sendMessage = (text: string) => {
     if (currentUser) {
       const messagePayload = {
-        user: currentUser,
+        username: currentUser,
         text: text,
         room: currentRoom,
       };
