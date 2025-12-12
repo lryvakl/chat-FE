@@ -2,7 +2,13 @@ export interface MessageInputProps {
   onSendMessage: (text: string) => void;
 }
 
+export interface MessageListProps {
+  messages: Message[];
+  currentUser: string;
+}
+
 export interface Message {
+  id?: number;
   text: string;
   user: string;
   room: string;

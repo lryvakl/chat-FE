@@ -1,12 +1,9 @@
-import { useSelector } from "react-redux";
 import { Box, Typography, Paper, Avatar } from "@mui/material";
 import { useEffect, useRef } from "react";
-import type { RootState } from "../store";
+import type { MessageListProps } from "../types/interfaces";
+import { formatTime } from "../utils/dateUtils";
 
-export const MessageList = () => {
-  const messages = useSelector((state: RootState) => state.chat.messages);
-  const currentUser = useSelector((state: RootState) => state.chat.currentUser);
-
+export const MessageList = ({ messages, currentUser }: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -17,12 +14,6 @@ export const MessageList = () => {
     scrollToBottom();
   }, [messages]);
 
-  const formatTime = (dateString?: string) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {messages.map((msg, index) => {
@@ -30,12 +21,12 @@ export const MessageList = () => {
 
         return (
           <Box
-            key={index}
+            key={msg.id || index}
             sx={{
               display: "flex",
               justifyContent: isMe ? "flex-end" : "flex-start",
               alignItems: "flex-end",
-              gap: 1,
+              mb: 1,
             }}
           >
             {!isMe && (
@@ -45,6 +36,7 @@ export const MessageList = () => {
                   height: 32,
                   bgcolor: "secondary.main",
                   fontSize: 14,
+                  mr: 1,
                 }}
               >
                 {msg.user.charAt(0).toUpperCase()}
