@@ -35,7 +35,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     if (room) {
-      (dispatch as any)(fetchMessages(room));
+      dispatch(fetchMessages(room));
     }
   }, [room, dispatch]);
 
