@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { TextField, Box, IconButton, useTheme, alpha } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import type { MessageInputProps } from "../utils/interfaces";
+import type { MessageInputProps } from "../types/interfaces";
 
 export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
   const [text, setText] = useState("");

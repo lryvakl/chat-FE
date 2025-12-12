@@ -14,8 +14,8 @@ import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { joinChat } from "../store/chatSlice";
 import { useNavigate } from "react-router-dom";
-import type { JoinChatPayload } from "../utils/interfaces";
-import { Room } from "../utils/enums";
+import type { JoinChatPayload } from "../types/interfaces";
+import { Room } from "../types/enums";
 
 export const JoinForm = () => {
   const [name, setName] = useState("");

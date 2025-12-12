@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { Message, ChatState, JoinChatPayload } from "../utils/interfaces";
+import type { Message, ChatState, JoinChatPayload } from "../types/interfaces";
 import { chatApi } from "../api/chatApi";
 
 const initialState: ChatState = {
@@ -13,7 +13,7 @@ const initialState: ChatState = {
 export const fetchMessages = createAsyncThunk(
   "chat/fetchMessages",
   async (room: string) => {
-    const response = await chatApi.getRecentlyMessages(room);
+    const response = await chatApi.getRecentMessages(room);
     return response;
   }
 );

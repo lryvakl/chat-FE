@@ -2,9 +2,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { socket } from "../api/socket";
 import { useEffect } from "react";
 import { addMessage } from "../store/chatSlice";
-import type { Message, ServerError } from "../utils/interfaces";
+import type { Message, ServerError } from "../types/interfaces";
 import type { RootState } from "../store";
-import { SocketEvent } from "../utils/enums";
+import { SocketEvent } from "../types/enums";
 
 export const useChat = () => {
   const dispatch = useDispatch();

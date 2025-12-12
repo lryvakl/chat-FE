@@ -1,8 +1,8 @@
-import type { Message } from "../utils/interfaces";
+import type { Message } from "../types/interfaces";
 import { SERVER_URL } from "../constants/index";
 
 export const chatApi = {
-  async getRecentlyMessages(room: string): Promise<Message[]> {
+  async getRecentMessages(room: string): Promise<Message[]> {
     const response = await fetch(`${SERVER_URL}/chat/messages?room=${room}`);
     if (!response.ok) {
       throw new Error(`status: ${response.status}`);
