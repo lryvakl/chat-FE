@@ -26,9 +26,13 @@ export const MessageList = ({
       <TransitionGroup>
         {messages.map((msg, index) => {
           const isMe = msg.user === currentUser;
+          const isLast = index === messages.length - 1;
 
           return (
-            <Collapse key={msg.id || index}>
+            <Collapse
+              key={msg.id || index}
+              onEntered={isLast ? scrollToBottom : undefined}
+            >
               <Box
                 sx={{
                   display: "flex",
