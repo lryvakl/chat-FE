@@ -3,6 +3,7 @@ export enum SocketEvent {
   ReceiveMessage = "receiveMessage",
   JoinRoom = "joinRoom",
   DeleteMessage = "deleteMessage",
+  MessageDeleted = "messageDeleted",
   ConnectionError = "connect_error",
   Exeption = "exeption",
 }

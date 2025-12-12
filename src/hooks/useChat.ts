@@ -29,13 +29,13 @@ export const useChat = () => {
     };
 
     socket.on(SocketEvent.ReceiveMessage, handleReceiveMessage);
-    socket.on(SocketEvent.DeleteMessage, handleDeleteMessage);
+    socket.on(SocketEvent.MessageDeleted, handleDeleteMessage);
     socket.on(SocketEvent.ConnectionError, handleError);
     socket.on(SocketEvent.Exeption, handleError);
 
     return () => {
       socket.off(SocketEvent.ReceiveMessage, handleReceiveMessage);
-      socket.off(SocketEvent.DeleteMessage, handleDeleteMessage);
+      socket.off(SocketEvent.MessageDeleted, handleDeleteMessage);
       socket.off(SocketEvent.ConnectionError, handleError);
       socket.off(SocketEvent.Exeption, handleError);
       socket.disconnect();
