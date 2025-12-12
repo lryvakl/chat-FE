@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { TextField, Box, IconButton, useTheme, alpha } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import type { MessageInputProps } from "../types/interfaces";
@@ -8,8 +8,10 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
   const theme = useTheme();
 
   const MAX_LENGTH = 800;
-  const currentLength = text.length;
-  const isLimitReached = currentLength >= MAX_LENGTH;
+
+  const isLimitReached = useMemo(() => {
+    return text.length >= MAX_LENGTH;
+  }, [text]);
 
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -26,11 +28,13 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
     }
   };
 
-  const getHelperText = () => {
-    if (isLimitReached)
+  const getHelperText = useMemo(() => {
+    if (isLimitReached) {
       return `Character limit reached (${text.length}/${MAX_LENGTH})`;
-    return `${text.length}/${MAX_LENGTH}`;
-  };
+    } else {
+      return `${text.length}/${MAX_LENGTH}`;
+    }
+  }, [text, isLimitReached]);
 
   return (
     <Box
@@ -54,7 +58,7 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
         size="small"
         autoComplete="off"
         error={isLimitReached}
-        helperText={getHelperText()}
+        helperText={getHelperText}
         inputProps={{
           maxLength: MAX_LENGTH,
         }}
