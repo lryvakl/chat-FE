@@ -28,11 +28,8 @@ const chatSlice = createSlice({
       state.messages = [];
     },
 
-    leaveChat: (state) => {
-      state.currentUser = "";
-      state.currentRoom = "";
-      state.messages = [];
-      state.isConnected = false;
+    leaveChat: () => {
+      return initialState;
     },
 
     setConnectionStatus: (state, action: PayloadAction<boolean>) => {
