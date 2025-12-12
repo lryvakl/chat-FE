@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useChat } from "../hooks/useChat";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
-import type { RootState } from "../store";
+import type { AppDispatch, RootState } from "../store";
 import { leaveChat, fetchMessages } from "../store/chatSlice";
 
 const ChatPage = () => {
@@ -24,7 +24,7 @@ const ChatPage = () => {
   const { messages, isLoading, error } = useSelector(
     (state: RootState) => state.chat
   );
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
