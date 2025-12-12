@@ -1,9 +1,14 @@
-import { Box, Typography, Paper, Avatar } from "@mui/material";
 import { useEffect, useRef } from "react";
+import { Box, Typography, Paper, Avatar, IconButton } from "@mui/material";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import type { MessageListProps } from "../types/interfaces";
 import { formatTime } from "../utils/dateUtils";
 
-export const MessageList = ({ messages, currentUser }: MessageListProps) => {
+export const MessageList = ({
+  messages,
+  currentUser,
+  onDeleteMessage,
+}: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -27,6 +32,10 @@ export const MessageList = ({ messages, currentUser }: MessageListProps) => {
               justifyContent: isMe ? "flex-end" : "flex-start",
               alignItems: "flex-end",
               mb: 1,
+              "&:hover .delete-btn": {
+                opacity: 1,
+                visibility: "visible",
+              },
             }}
           >
             {!isMe && (
@@ -41,6 +50,24 @@ export const MessageList = ({ messages, currentUser }: MessageListProps) => {
               >
                 {msg.user.charAt(0).toUpperCase()}
               </Avatar>
+            )}
+
+            {isMe && msg.id && (
+              <IconButton
+                className="delete-btn"
+                size="small"
+                onClick={() => onDeleteMessage(msg.id!)}
+                sx={{
+                  opacity: 0,
+                  visibility: "hidden",
+                  mr: 1,
+                  color: "text.secondary",
+                  transition: "all 0.2s",
+                  "&:hover": { color: "error.main" },
+                }}
+              >
+                <DeleteOutlineIcon fontSize="small" />
+              </IconButton>
             )}
 
             <Paper

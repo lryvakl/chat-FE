@@ -19,7 +19,7 @@ import type { AppDispatch, RootState } from "../store";
 import { leaveChat, fetchMessages } from "../store/chatSlice";
 
 const ChatPage = () => {
-  const { sendMessage, currentUser } = useChat();
+  const { sendMessage, deleteMessage, currentUser } = useChat();
   const { room } = useParams();
   const { messages, isLoading, error } = useSelector(
     (state: RootState) => state.chat
@@ -127,7 +127,11 @@ const ChatPage = () => {
           <Box
             sx={{ flexGrow: 1, overflowY: "auto", p: 2, bgcolor: "#fafafa" }}
           >
-            <MessageList messages={messages} currentUser={currentUser} />
+            <MessageList
+              messages={messages}
+              currentUser={currentUser}
+              onDeleteMessage={deleteMessage}
+            />
           </Box>
 
           <Box sx={{ p: 2, bgcolor: "white", borderTop: "1px solid #e0e0e0" }}>

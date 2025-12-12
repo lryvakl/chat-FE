@@ -12,12 +12,8 @@ export const useChat = () => {
   const currentRoom = useSelector((state: RootState) => state.chat.currentRoom);
 
   useEffect(() => {
-    socket.connect();
-    if (currentUser && currentRoom) {
-      socket.emit(SocketEvent.JoinRoom, {
-        user: currentUser,
-        room: currentRoom,
-      });
+    if (!socket.connected) {
+      socket.connect();
     }
 
     const handleReceiveMessage = (message: Message) => {
@@ -29,7 +25,6 @@ export const useChat = () => {
     };
 
     socket.on(SocketEvent.ReceiveMessage, handleReceiveMessage);
-
     socket.on(SocketEvent.ConnectionError, handleError);
     socket.on(SocketEvent.Exeption, handleError);
 
@@ -39,7 +34,16 @@ export const useChat = () => {
       socket.off(SocketEvent.Exeption, handleError);
       socket.disconnect();
     };
-  }, [dispatch, currentUser, currentRoom]);
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (currentUser && currentRoom) {
+      socket.emit(SocketEvent.JoinRoom, {
+        username: currentUser,
+        room: currentRoom,
+      });
+    }
+  }, [currentUser, currentRoom]);
 
   const sendMessage = (text: string) => {
     if (currentUser) {
@@ -52,5 +56,14 @@ export const useChat = () => {
     }
   };
 
-  return { sendMessage, currentUser, currentRoom };
+  const deleteMessage = (messageId: number) => {
+    const payload = {
+      messageId,
+      room: currentRoom,
+      username: currentUser,
+    };
+    socket.emit(SocketEvent.DeleteMessage, payload);
+  };
+
+  return { sendMessage, deleteMessage, currentUser, currentRoom };
 };

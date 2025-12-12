@@ -5,6 +5,7 @@ export interface MessageInputProps {
 export interface MessageListProps {
   messages: Message[];
   currentUser: string;
+  onDeleteMessage: (messageId: number) => void;
 }
 
 export interface Message {
