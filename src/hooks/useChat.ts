@@ -1,9 +1,9 @@
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { socket } from "../api/socket";
-import { useEffect } from "react";
-import { addMessage, removeMessage } from "../store/chatSlice";
-import type { Message, ServerError } from "../types/interfaces";
 import type { RootState } from "../store";
+import { addMessage, removeMessage, updateMessage } from "../store/chatSlice";
+import type { Message, ServerError } from "../types/interfaces";
 import { SocketEvent } from "../types/enums";
 
 export const useChat = () => {
@@ -24,20 +24,26 @@ export const useChat = () => {
       dispatch(removeMessage(messageId));
     };
 
+    const handleEditMessage = (message: Message) => {
+      dispatch(updateMessage(message));
+    };
+
     const handleError = (error: Error | ServerError) => {
       console.error(error.message);
     };
 
     socket.on(SocketEvent.ReceiveMessage, handleReceiveMessage);
     socket.on(SocketEvent.MessageDeleted, handleDeleteMessage);
+    socket.on(SocketEvent.MessageUpdated, handleEditMessage);
     socket.on(SocketEvent.ConnectionError, handleError);
-    socket.on(SocketEvent.Exeption, handleError);
+    socket.on(SocketEvent.Exception, handleError);
 
     return () => {
       socket.off(SocketEvent.ReceiveMessage, handleReceiveMessage);
       socket.off(SocketEvent.MessageDeleted, handleDeleteMessage);
+      socket.off(SocketEvent.MessageUpdated, handleEditMessage);
       socket.off(SocketEvent.ConnectionError, handleError);
-      socket.off(SocketEvent.Exeption, handleError);
+      socket.off(SocketEvent.Exception, handleError);
       socket.disconnect();
     };
   }, [dispatch]);
@@ -71,5 +77,14 @@ export const useChat = () => {
     socket.emit(SocketEvent.DeleteMessage, payload);
   };
 
-  return { sendMessage, deleteMessage, currentUser, currentRoom };
+  const editMessage = (messageId: number, newText: string) => {
+    socket.emit(SocketEvent.EditMessage, {
+      messageId: messageId,
+      text: newText,
+      room: currentRoom,
+      username: currentUser,
+    });
+  };
+
+  return { sendMessage, deleteMessage, editMessage, currentUser, currentRoom };
 };

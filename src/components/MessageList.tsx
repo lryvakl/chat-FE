@@ -1,8 +1,15 @@
 import { useEffect, useRef } from "react";
-import { Box, Typography, Paper, Avatar, IconButton } from "@mui/material";
+import {
+  Box,
+  Collapse,
+  Typography,
+  Paper,
+  Avatar,
+  IconButton,
+} from "@mui/material";
 import { TransitionGroup } from "react-transition-group";
-import { Collapse } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EditIcon from "@mui/icons-material/Edit";
 import type { MessageListProps } from "../types/interfaces";
 import { formatTime } from "../utils/dateUtils";
 
@@ -10,6 +17,7 @@ export const MessageList = ({
   messages,
   currentUser,
   onDeleteMessage,
+  onEditMessage,
 }: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -39,7 +47,7 @@ export const MessageList = ({
                   justifyContent: isMe ? "flex-end" : "flex-start",
                   alignItems: "flex-end",
                   mb: 1,
-                  "&:hover .delete-btn": {
+                  "&:hover .delete-btn .edit-btn": {
                     opacity: 1,
                     visibility: "visible",
                   },
@@ -57,6 +65,24 @@ export const MessageList = ({
                   >
                     {msg.user.charAt(0).toUpperCase()}
                   </Avatar>
+                )}
+
+                {isMe && msg.id && (
+                  <IconButton
+                    className="edit-btn"
+                    size="small"
+                    onClick={() => onEditMessage(msg)}
+                    sx={{
+                      opacity: 0,
+                      visibility: "hidden",
+                      mr: 1,
+                      color: "text.secondary",
+                      transition: "all 0.3s",
+                      "&:hover": { color: "error.main" },
+                    }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
                 )}
 
                 {isMe && msg.id && (

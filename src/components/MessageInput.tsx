@@ -1,23 +1,31 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { TextField, Box, IconButton, useTheme, alpha } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
 import type { MessageInputProps } from "../types/interfaces";
 
-export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
-  const [text, setText] = useState("");
+export const MessageInput = ({
+  onSendMessage,
+  editingMessage,
+  onEditMessage,
+  onCancelEdit,
+  text,
+  setText,
+}: MessageInputProps) => {
   const theme = useTheme();
-
   const MAX_LENGTH = 800;
 
-  const isLimitReached = useMemo(() => {
-    return text.length >= MAX_LENGTH;
-  }, [text]);
+  const isLimitReached = useMemo(() => text.length >= MAX_LENGTH, [text]);
 
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (text.trim()) {
+    if (text.trim()) return;
+
+    if (editingMessage) {
+      onEditMessage();
+    } else {
       onSendMessage(text);
-      setText("");
     }
   };
 
@@ -49,7 +57,9 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
       <TextField
         fullWidth
         variant="outlined"
-        placeholder="Type a message..."
+        placeholder={
+          editingMessage ? "Editing message..." : "Type a message..."
+        }
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -95,6 +105,15 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
         }}
       >
         <SendIcon fontSize="small" />
+      </IconButton>
+      {editingMessage && (
+        <IconButton onClick={onCancelEdit} color="error">
+          <CloseIcon />
+        </IconButton>
+      )}
+
+      <IconButton type="submit" color="primary">
+        {editingMessage ? <CheckIcon /> : <SendIcon />}
       </IconButton>
     </Box>
   );

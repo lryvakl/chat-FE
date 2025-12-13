@@ -1,11 +1,13 @@
 export enum SocketEvent {
   SendMessage = "sendMessage",
   ReceiveMessage = "receiveMessage",
-  JoinRoom = "joinRoom",
+  EditMessage = "editMessage",
+  MessageUpdated = "messageUdpated",
   DeleteMessage = "deleteMessage",
   MessageDeleted = "messageDeleted",
+  JoinRoom = "joinRoom",
   ConnectionError = "connect_error",
-  Exeption = "exeption",
+  Exception = "exception",
 }
 
 export enum Room {

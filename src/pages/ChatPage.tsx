@@ -1,3 +1,6 @@
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -9,17 +12,17 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../store";
+import { leaveChat, fetchMessages } from "../store/chatSlice";
+import type { Message } from "../types/interfaces";
 import { useChat } from "../hooks/useChat";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
-import type { AppDispatch, RootState } from "../store";
-import { leaveChat, fetchMessages } from "../store/chatSlice";
 
 const ChatPage = () => {
-  const { sendMessage, deleteMessage, currentUser } = useChat();
+  const { sendMessage, deleteMessage, editMessage, currentUser } = useChat();
+  const [inputText, setInputText] = useState("");
+  const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const { room } = useParams();
   const { messages, isLoading, error } = useSelector(
     (state: RootState) => state.chat
@@ -38,6 +41,29 @@ const ChatPage = () => {
       dispatch(fetchMessages(room));
     }
   }, [room, dispatch]);
+
+  const handleStartEdit = (message: Message) => {
+    setEditingMessage(message);
+    setInputText(message.text);
+  };
+
+  const handleFinishEdit = () => {
+    if (inputText.trim() && editingMessage?.id) {
+      editMessage(editingMessage.id, inputText);
+    }
+    setEditingMessage(null);
+    setInputText("");
+  };
+
+  const handleSendMessageWrapper = (text: string) => {
+    sendMessage(text);
+    setInputText("");
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMessage(null);
+    setInputText("");
+  };
 
   const handleLeave = () => {
     dispatch(leaveChat());
@@ -131,11 +157,19 @@ const ChatPage = () => {
               messages={messages}
               currentUser={currentUser}
               onDeleteMessage={deleteMessage}
+              onEditMessage={handleStartEdit}
             />
           </Box>
 
           <Box sx={{ p: 2, bgcolor: "white", borderTop: "1px solid #e0e0e0" }}>
-            <MessageInput onSendMessage={sendMessage} />
+            <MessageInput
+              text={inputText}
+              setText={setInputText}
+              onSendMessage={handleSendMessageWrapper}
+              editingMessage={editingMessage}
+              onEditMessage={handleFinishEdit}
+              onCancelEdit={handleCancelEdit}
+            />
           </Box>
         </Paper>
       </Container>

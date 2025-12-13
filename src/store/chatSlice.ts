@@ -14,9 +14,14 @@ const initialState: ChatState = {
 
 export const fetchMessages = createAsyncThunk(
   "chat/fetchMessages",
-  async (room: string) => {
-    const response = await chatApi.getRecentMessages(room);
-    return response;
+  async (room: string, { rejectWithValue }) => {
+    try {
+      const response = await chatApi.getRecentMessages(room);
+      return response;
+    } catch (error: unknown) {
+      if (error instanceof Error) return rejectWithValue(error.message);
+    }
+    return rejectWithValue("Failed to fetch messages");
   }
 );
 
@@ -48,6 +53,14 @@ const chatSlice = createSlice({
         (msg) => msg.id !== action.payload
       );
     },
+    updateMessage: (state, action: PayloadAction<Message>) => {
+      const message = state.messages.find(
+        (msg) => msg.id === action.payload.id
+      );
+      if (message) {
+        message.text = action.payload.text;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -60,8 +73,8 @@ const chatSlice = createSlice({
         state.messages = action.payload;
       })
       .addCase(fetchMessages.rejected, (state, action) => {
-        state.isLoading = true;
-        state.error = action.error.message || "Something went wrong";
+        state.isLoading = false;
+        state.error = (action.payload as string) || "Something went wrong";
         console.error(action.error);
       });
   },
@@ -73,5 +86,6 @@ export const {
   setConnectionStatus,
   addMessage,
   removeMessage,
+  updateMessage,
 } = chatSlice.actions;
 export default chatSlice.reducer;
