@@ -2,11 +2,14 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { Message, ChatState, JoinChatPayload } from "../types/interfaces";
 import { chatApi } from "../api/chatApi";
+import { loadSession, saveSession, clearSession } from "../utils/storage";
+
+const savedSession = loadSession();
 
 const initialState: ChatState = {
   messages: [],
-  currentUser: "",
-  currentRoom: "",
+  currentUser: savedSession?.username || "",
+  currentRoom: savedSession?.room || "",
   isConnected: false,
   isLoading: false,
   error: null,
@@ -35,9 +38,15 @@ const chatSlice = createSlice({
       state.messages = [];
       state.error = null;
       state.isLoading = false;
+
+      saveSession({
+        username: action.payload.name,
+        room: action.payload.room,
+      });
     },
 
     leaveChat: () => {
+      clearSession();
       return initialState;
     },
 
