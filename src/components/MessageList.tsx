@@ -47,7 +47,7 @@ export const MessageList = ({
                   justifyContent: isMe ? "flex-end" : "flex-start",
                   alignItems: "flex-end",
                   mb: 1,
-                  "&:hover .delete-btn .edit-btn": {
+                  "&:hover .delete-btn, &:hover .edit-btn": {
                     opacity: 1,
                     visibility: "visible",
                   },

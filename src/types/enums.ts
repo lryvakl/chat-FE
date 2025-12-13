@@ -2,7 +2,7 @@ export enum SocketEvent {
   SendMessage = "sendMessage",
   ReceiveMessage = "receiveMessage",
   EditMessage = "editMessage",
-  MessageUpdated = "messageUdpated",
+  MessageUpdated = "messageUpdated",
   DeleteMessage = "deleteMessage",
   MessageDeleted = "messageDeleted",
   JoinRoom = "joinRoom",

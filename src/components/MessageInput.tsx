@@ -20,7 +20,7 @@ export const MessageInput = ({
 
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (text.trim()) return;
+    if (!text.trim()) return;
 
     if (editingMessage) {
       onEditMessage();
@@ -57,9 +57,7 @@ export const MessageInput = ({
       <TextField
         fullWidth
         variant="outlined"
-        placeholder={
-          editingMessage ? "Editing message..." : "Type a message..."
-        }
+        placeholder={editingMessage ? "Edit message..." : "Type a message..."}
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -69,9 +67,7 @@ export const MessageInput = ({
         autoComplete="off"
         error={isLimitReached}
         helperText={getHelperText}
-        inputProps={{
-          maxLength: MAX_LENGTH,
-        }}
+        inputProps={{ maxLength: MAX_LENGTH }}
         FormHelperTextProps={{
           sx: {
             textAlign: isLimitReached ? "left" : "right",
@@ -89,9 +85,14 @@ export const MessageInput = ({
         }}
       />
 
+      {editingMessage && (
+        <IconButton onClick={onCancelEdit} color="error" size="small">
+          <CloseIcon />
+        </IconButton>
+      )}
+
       <IconButton
         type="submit"
-        color="primary"
         disabled={!text.trim()}
         sx={{
           bgcolor: text.trim() ? "primary.main" : "action.disabledBackground",
@@ -102,17 +103,9 @@ export const MessageInput = ({
           width: 40,
           height: 40,
           mb: 0.5,
+          transition: "background-color 0.2s",
         }}
       >
-        <SendIcon fontSize="small" />
-      </IconButton>
-      {editingMessage && (
-        <IconButton onClick={onCancelEdit} color="error">
-          <CloseIcon />
-        </IconButton>
-      )}
-
-      <IconButton type="submit" color="primary">
         {editingMessage ? <CheckIcon /> : <SendIcon />}
       </IconButton>
     </Box>
