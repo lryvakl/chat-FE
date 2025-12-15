@@ -9,15 +9,16 @@ import {
   Container,
   Paper,
   Button,
-  CircularProgress,
   Alert,
 } from "@mui/material";
 import type { AppDispatch, RootState } from "../store";
-import { leaveChat, fetchMessages } from "../store/chatSlice";
+import { leaveChat } from "../store/chatSlice";
+import { fetchMessages } from "../store/thunk/fetchMessages";
 import type { Message } from "../types/interfaces";
 import { useChat } from "../hooks/useChat";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
+import Loader from "../components/utils/Loader";
 
 const ChatPage = () => {
   const { sendMessage, deleteMessage, editMessage, currentUser } = useChat();
@@ -73,16 +74,7 @@ const ChatPage = () => {
   if (!currentUser) return null;
 
   if (isLoading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <Loader fullScreen message="Loading chat history..." />;
   }
 
   if (error) {

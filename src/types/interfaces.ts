@@ -14,6 +14,11 @@ export interface MessageListProps {
   onEditMessage: (message: Message) => void;
 }
 
+export interface LoaderProps {
+  fullScreen?: boolean;
+  message?: string;
+}
+
 export interface Message {
   id?: number;
   text: string;

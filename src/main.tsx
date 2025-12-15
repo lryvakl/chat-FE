@@ -5,24 +5,12 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import App from "./App.tsx";
 import { store, persistor } from "./store/index.ts";
-import { CircularProgress, Box } from "@mui/material";
+import { Loader } from "./components/utils/Loader.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <PersistGate
-        loading={
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="100vh"
-          >
-            <CircularProgress />
-          </Box>
-        }
-        persistor={persistor}
-      >
+      <PersistGate loading={<Loader fullScreen />} persistor={persistor}>
         <BrowserRouter>
           <App />
         </BrowserRouter>
