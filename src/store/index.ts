@@ -15,7 +15,7 @@ import chatReducer from "./chatSlice";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["chat"],
+  whitelist: ["chat", "auth"],
 };
 
 const rootReducer = combineReducers({
