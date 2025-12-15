@@ -8,13 +8,16 @@ import { SocketEvent } from "../types/enums";
 
 export const useChat = () => {
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.auth.user);
+  const { user, token } = useSelector((state: RootState) => state.auth);
   const currentUser = user?.username || "";
   const currentRoom = useSelector((state: RootState) => state.chat.currentRoom);
 
   useEffect(() => {
-    if (!socket.connected) {
+    if (token) {
+      socket.auth = { token };
       socket.connect();
+    } else {
+      return;
     }
 
     const handleReceiveMessage = (message: Message) => {
@@ -47,7 +50,7 @@ export const useChat = () => {
       socket.off(SocketEvent.Exception, handleError);
       socket.disconnect();
     };
-  }, [dispatch]);
+  }, [dispatch, token]);
 
   useEffect(() => {
     if (currentUser && currentRoom) {
