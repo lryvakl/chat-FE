@@ -1,17 +1,32 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { Provider } from "react-redux";
-import { store } from "./store/index.ts";
-import "./index.css";
-import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import App from "./App.tsx";
+import { store, persistor } from "./store/index.ts";
+import { CircularProgress, Box } from "@mui/material";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <PersistGate
+        loading={
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="100vh"
+          >
+            <CircularProgress />
+          </Box>
+        }
+        persistor={persistor}
+      >
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </PersistGate>
     </Provider>
-  </StrictMode>,
+  </StrictMode>
 );
