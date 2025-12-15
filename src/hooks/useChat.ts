@@ -8,7 +8,8 @@ import { SocketEvent } from "../types/enums";
 
 export const useChat = () => {
   const dispatch = useDispatch();
-  const currentUser = useSelector((state: RootState) => state.chat.currentUser);
+  const user = useSelector((state: RootState) => state.auth.user);
+  const currentUser = user?.username || "";
   const currentRoom = useSelector((state: RootState) => state.chat.currentRoom);
 
   useEffect(() => {

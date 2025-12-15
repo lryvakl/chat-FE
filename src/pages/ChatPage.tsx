@@ -8,37 +8,43 @@ import {
   Box,
   Container,
   Paper,
-  Button,
-  CircularProgress,
   Alert,
 } from "@mui/material";
 import type { AppDispatch, RootState } from "../store";
-import { leaveChat } from "../store/chatSlice";
+import { setRoom } from "../store/chatSlice";
 import { fetchMessages } from "../store/thunks/fetchMessages";
 import type { Message } from "../types/interfaces";
 import { useChat } from "../hooks/useChat";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
+import { ChatSidebar } from "../components/ChatSidebar";
+import { Room } from "../types/enums";
+import { logout } from "../store/authSlice";
+//import { Loader } from "../components/utils/Loader";
 
 const ChatPage = () => {
   const { sendMessage, deleteMessage, editMessage, currentUser } = useChat();
   const [inputText, setInputText] = useState("");
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const { room } = useParams();
+  const rooms = Object.values(Room);
+
   const { messages, isLoading, error } = useSelector(
     (state: RootState) => state.chat
   );
+
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!currentUser) {
-      navigate("/");
+      navigate("/login");
     }
   }, [currentUser, navigate]);
 
   useEffect(() => {
     if (room) {
+      dispatch(setRoom(room));
       dispatch(fetchMessages(room));
     }
   }, [room, dispatch]);
@@ -67,113 +73,99 @@ const ChatPage = () => {
   };
 
   const handleLeave = () => {
-    dispatch(leaveChat());
-    navigate("/");
+    dispatch(logout());
+    navigate("/login");
   };
 
   if (!currentUser) return null;
 
-  if (isLoading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return <Alert severity="error">{error}</Alert>;
-  }
-
   return (
-    <Box
-      sx={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <AppBar position="static" elevation={1} color="default" sx={{}}>
-        <Toolbar>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, color: "text.primary" }}
-          >
-            Chat Room
-          </Typography>
+    <Box sx={{ display: "flex", height: "100vh" }}>
+      <ChatSidebar rooms={rooms} currentRoom={room} onLogout={handleLeave} />
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Typography
-                variant="subtitle1"
-                sx={{ color: "text.primary", fontWeight: "bold" }}
-              >
-                {currentUser}
-              </Typography>
-            </Box>
-
-            <Button
-              variant="outlined"
-              color="error"
-              size="small"
-              onClick={handleLeave}
-            >
-              Leave
-            </Button>
-          </Box>
-        </Toolbar>
-      </AppBar>
-
-      <Container
-        maxWidth="md"
+      <Box
+        component="main"
         sx={{
           flexGrow: 1,
           display: "flex",
           flexDirection: "column",
-          py: 2,
-          overflow: "hidden",
+          height: "100vh",
         }}
       >
-        <Paper
-          elevation={0}
+        <AppBar position="static" color="default" elevation={1}>
+          <Toolbar>
+            <Typography variant="h6" sx={{ flexGrow: 1 }}>
+              {room ? `Room: ${room}` : "Select a room"}
+            </Typography>
+            <Typography variant="subtitle2" color="text.secondary">
+              Logged as: <b>{currentUser}</b>
+            </Typography>
+          </Toolbar>
+        </AppBar>
+
+        <Container
+          maxWidth="md"
           sx={{
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
+            py: 2,
             overflow: "hidden",
-            borderRadius: 2,
-            border: "1px solid #e0e0e0",
           }}
         >
-          <Box
-            sx={{ flexGrow: 1, overflowY: "auto", p: 2, bgcolor: "#fafafa" }}
+          <Paper
+            elevation={0}
+            sx={{
+              flexGrow: 1,
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+              borderRadius: 2,
+              border: "1px solid #e0e0e0",
+              position: "relative",
+            }}
           >
-            <MessageList
-              messages={messages}
-              currentUser={currentUser}
-              onDeleteMessage={deleteMessage}
-              onEditMessage={handleStartEdit}
-            />
-          </Box>
+            {isLoading ? (
+              <Box sx={{ flexGrow: 1 }}>
+                {/*   <Loader fullScreen={false} message="Loading messages..." /> */}
+              </Box>
+            ) : error ? (
+              <Box p={3}>
+                <Alert severity="error">{error}</Alert>
+              </Box>
+            ) : (
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  overflowY: "auto",
+                  p: 2,
+                  bgcolor: "#fafafa",
+                }}
+              >
+                <MessageList
+                  messages={messages}
+                  currentUser={currentUser}
+                  onDeleteMessage={deleteMessage}
+                  onEditMessage={handleStartEdit}
+                />
+              </Box>
+            )}
 
-          <Box sx={{ p: 2, bgcolor: "white", borderTop: "1px solid #e0e0e0" }}>
-            <MessageInput
-              text={inputText}
-              setText={setInputText}
-              onSendMessage={handleSendMessageWrapper}
-              editingMessage={editingMessage}
-              onEditMessage={handleFinishEdit}
-              onCancelEdit={handleCancelEdit}
-            />
-          </Box>
-        </Paper>
-      </Container>
+            <Box
+              sx={{ p: 2, bgcolor: "white", borderTop: "1px solid #e0e0e0" }}
+            >
+              <MessageInput
+                text={inputText}
+                setText={setInputText}
+                onSendMessage={handleSendMessageWrapper}
+                editingMessage={editingMessage}
+                onEditMessage={handleFinishEdit}
+                onCancelEdit={handleCancelEdit}
+              />
+            </Box>
+          </Paper>
+        </Container>
+      </Box>
     </Box>
   );
 };

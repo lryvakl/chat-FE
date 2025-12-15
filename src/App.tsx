@@ -1,7 +1,6 @@
-import JoinForm from "./components/JoinForm";
 import ChatPage from "./pages/ChatPage";
 import RegisterPage from "./pages/RegisterPage";
-//import LoginPage from "./pages/LoginPage"
+import LoginPage from "./pages/LoginPage";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "./store";
@@ -11,18 +10,23 @@ function App() {
   const token = useSelector((state: RootState) => state.auth.token);
   return (
     <Routes>
-      <Route path="/" element={<JoinForm />} />
+      <Route
+        path="/login"
+        element={!token ? <LoginPage /> : <Navigate to="/chat/General" />}
+      />
       <Route
         path="/register"
-        element={!token ? <RegisterPage /> : <Navigate to="/chat" />}
+        element={!token ? <RegisterPage /> : <Navigate to="/chat/General" />}
       />
 
       <Route
-        path="/chat"
+        path="/chat/:room"
         element={token ? <ChatPage /> : <Navigate to="/login" />}
       />
-      <Route path="/chat/:room" element={<ChatPage />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+
+      <Route path="/chat" element={<Navigate to="/chat/General" replace />} />
+
+      <Route path="/" element={<Navigate to="/chat/General" />} />
     </Routes>
   );
 }

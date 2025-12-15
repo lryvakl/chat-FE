@@ -57,6 +57,10 @@ const chatSlice = createSlice({
         message.text = action.payload.text;
       }
     },
+    setRoom: (state, action: PayloadAction<string>) => {
+      state.currentRoom = action.payload;
+      state.messages = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -83,6 +87,7 @@ export const {
   addMessage,
   removeMessage,
   updateMessage,
+  setRoom,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

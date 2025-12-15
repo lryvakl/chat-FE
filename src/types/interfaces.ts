@@ -14,6 +14,12 @@ export interface MessageListProps {
   onEditMessage: (message: Message) => void;
 }
 
+export interface ChatSidebarProps {
+  rooms: string[];
+  currentRoom?: string;
+  onLogout: () => void;
+}
+
 export interface Message {
   id?: number;
   text: string;
