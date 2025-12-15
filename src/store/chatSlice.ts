@@ -1,8 +1,8 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { Message, ChatState, JoinChatPayload } from "../types/interfaces";
-import { chatApi } from "../api/chatApi";
 import { loadSession, saveSession, clearSession } from "../utils/storage";
+import { fetchMessages } from "./thunk/fetchMessages";
 
 const savedSession = loadSession();
 
@@ -14,19 +14,6 @@ const initialState: ChatState = {
   isLoading: false,
   error: null,
 };
-
-export const fetchMessages = createAsyncThunk(
-  "chat/fetchMessages",
-  async (room: string, { rejectWithValue }) => {
-    try {
-      const response = await chatApi.getRecentMessages(room);
-      return response;
-    } catch (error: unknown) {
-      if (error instanceof Error) return rejectWithValue(error.message);
-    }
-    return rejectWithValue("Failed to fetch messages");
-  }
-);
 
 const chatSlice = createSlice({
   name: "chat",
@@ -97,4 +84,5 @@ export const {
   removeMessage,
   updateMessage,
 } = chatSlice.actions;
+
 export default chatSlice.reducer;

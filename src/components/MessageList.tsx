@@ -13,7 +13,7 @@ import { TransitionGroup } from "react-transition-group";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import type { MessageListProps } from "../types/interfaces";
-import { formatTime, isSameDay, formatDateSeparator } from "../utils/dateUtils";
+import { formatTime, isSameDay, formatDateSeparator } from "../utils/dateFormatters";
 
 export const MessageList = ({
   messages,
