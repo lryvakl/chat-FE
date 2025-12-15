@@ -5,6 +5,9 @@ import { store } from "./store/index.ts";
 import "./index.css";
 import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
+import { setupAxiosInterceptors } from "../src/api/axios.instance.ts";
+
+setupAxiosInterceptors(store);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -13,5 +16,5 @@ createRoot(document.getElementById("root")!).render(
         <App />
       </BrowserRouter>
     </Provider>
-  </StrictMode>,
+  </StrictMode>
 );
