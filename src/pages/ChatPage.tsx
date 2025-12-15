@@ -13,7 +13,8 @@ import {
   Alert,
 } from "@mui/material";
 import type { AppDispatch, RootState } from "../store";
-import { leaveChat, fetchMessages } from "../store/chatSlice";
+import { leaveChat } from "../store/chatSlice";
+import { fetchMessages } from "../store/thunks/fetchMessages";
 import type { Message } from "../types/interfaces";
 import { useChat } from "../hooks/useChat";
 import MessageList from "../components/MessageList";

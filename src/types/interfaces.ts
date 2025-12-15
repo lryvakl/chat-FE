@@ -31,6 +31,13 @@ export interface ChatState {
   error: string | null;
 }
 
+export interface AuthState {
+  user: User | null;
+  token: string | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
 export interface JoinChatPayload {
   name: string;
   room: string;
@@ -44,4 +51,21 @@ export interface ServerError {
 export interface ChatSession {
   username: string;
   room: string;
+}
+
+export interface AuthCredentials {
+  username: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  user: {
+    id: number;
+    username: string;
+  };
+}
+export interface User {
+  id: number;
+  username: string;
 }
