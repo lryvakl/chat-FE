@@ -1,9 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { Message, ChatState, JoinChatPayload } from "../types/interfaces";
-import { loadSession, saveSession, clearSession } from "../utils/storage";
 import { fetchMessages } from "./thunks/fetchMessages";
-
 
 const initialState: ChatState = {
   messages: [],
