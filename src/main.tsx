@@ -1,20 +1,25 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
-import { store } from "./store/index.ts";
-import "./index.css";
+import { PersistGate } from "redux-persist/integration/react";
 import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { setupAxiosInterceptors } from "../src/api/axios.instance.ts";
 
 setupAxiosInterceptors(store);
+import { store, persistor } from "./store/index.ts";
+import { Loader } from "./components/utils/Loader.tsx";
+
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <PersistGate loading={<Loader fullScreen />} persistor={persistor}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </PersistGate>
     </Provider>
   </StrictMode>
 );

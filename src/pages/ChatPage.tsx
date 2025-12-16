@@ -20,7 +20,7 @@ import MessageInput from "../components/MessageInput";
 import { ChatSidebar } from "../components/ChatSidebar";
 import { Room } from "../types/enums";
 import { logout } from "../store/authSlice";
-//import { Loader } from "../components/utils/Loader";
+import { Loader } from "../components/utils/Loader";
 
 const ChatPage = () => {
   const { sendMessage, deleteMessage, editMessage, currentUser } = useChat();
@@ -127,7 +127,7 @@ const ChatPage = () => {
           >
             {isLoading ? (
               <Box sx={{ flexGrow: 1 }}>
-                {/*   <Loader fullScreen={false} message="Loading messages..." /> */}
+                <Loader fullScreen={false} message="Loading messages..." /> 
               </Box>
             ) : error ? (
               <Box p={3}>

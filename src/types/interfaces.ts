@@ -20,6 +20,11 @@ export interface ChatSidebarProps {
   onLogout: () => void;
 }
 
+export interface LoaderProps {
+  fullScreen?: boolean;
+  message?: string;
+}
+
 export interface Message {
   id?: number;
   text: string;
