@@ -1,0 +1,28 @@
+{
+  "header": {
+    "title": "Czat",
+    "logout": "Wyloguj się"
+  },
+  "auth": {
+    "login": "Zaloguj się",
+    "registration": "Rejestracja",
+    "username": "Nazwa użytkownika",
+    "password": "Hasło",
+    "signIn": "Zaloguj się",
+    "signingIn...": "Logowanie...",
+    "offerToRegister": "Nie masz jeszcze konta?",
+    "haveAnAccount": "Masz już konto?",
+    "signUp": "Zarejestruj się",
+    "signingUp...": "Rejestracja...",
+    "placeholder": "Wpisz swoje imię"
+  },
+  "chat": {
+    "typeMessage": "Napisz wiadomość...",
+    "editMessage": "Edytuj wiadomość...",
+    "room": "Pokój",
+    "currentUser": "Użytkownik",
+    "today": "Dzisiaj",
+    "yesterday": "Wczoraj",
+    "loading": "Załadunek"
+  }
+}

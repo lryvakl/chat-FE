@@ -10,6 +10,7 @@ import {
   Paper,
   Alert,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import type { AppDispatch, RootState } from "../store";
 import { setRoom } from "../store/chatSlice";
 import { fetchMessages } from "../store/thunks/fetchMessages";
@@ -27,6 +28,7 @@ const ChatPage = () => {
   const [inputText, setInputText] = useState("");
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const { room } = useParams();
+  const { t } = useTranslation();
   const rooms = Object.values(Room);
 
   const { messages, isLoading, error } = useSelector(
@@ -95,10 +97,10 @@ const ChatPage = () => {
         <AppBar position="static" color="default" elevation={1}>
           <Toolbar>
             <Typography variant="h6" sx={{ flexGrow: 1 }}>
-              {room ? `Room: ${room}` : "Select a room"}
+              {room ? `${t("chat.room")}: ${room}` : "Select a room"}
             </Typography>
             <Typography variant="subtitle2" color="text.secondary">
-              Logged as: <b>{currentUser}</b>
+              {t("chat.currentUser")}: <b>{currentUser}</b>
             </Typography>
           </Toolbar>
         </AppBar>
@@ -127,7 +129,7 @@ const ChatPage = () => {
           >
             {isLoading ? (
               <Box sx={{ flexGrow: 1 }}>
-                <Loader fullScreen={false} message="Loading messages..." /> 
+                <Loader fullScreen={false} message={t("chat.loading")} />
               </Box>
             ) : error ? (
               <Box p={3}>

@@ -1,3 +1,5 @@
+import type { TFunction } from "i18next";
+
 export const formatTime = (dateString?: string) => {
   if (!dateString) {
     return "";
@@ -16,18 +18,22 @@ export const isSameDay = (d_1: string | Date, d_2: string | Date) => {
   );
 };
 
-export const formatDateSeparator = (dateString: string | Date) => {
+export const formatDateSeparator = (
+  dateString: string | Date,
+  t: TFunction,
+  currentLang: string = "uk"
+) => {
   const date = new Date(dateString);
   const today = new Date();
   const yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
   if (isSameDay(date, today)) {
-    return "Today";
+    return t("chat.today");
   }
   if (isSameDay(date, yesterday)) {
-    return "Yesterday";
+    return t("chat.yesterday");
   }
-  return date.toLocaleDateString([], {
+  return date.toLocaleDateString(currentLang, {
     day: "numeric",
     month: "long",
     year: date.getFullYear() !== today.getFullYear() ? "numeric" : undefined,

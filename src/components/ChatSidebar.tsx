@@ -8,9 +8,13 @@ import {
   ListItemText,
   Divider,
   Button,
+  Typography,
 } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { ChatSidebarProps } from "../types/interfaces";
+import { LanguageSwitcher } from "./utils/LanguageSwitcher";
 
 export const ChatSidebar = ({
   rooms,
@@ -18,6 +22,7 @@ export const ChatSidebar = ({
   onLogout,
 }: ChatSidebarProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <Drawer
@@ -28,7 +33,21 @@ export const ChatSidebar = ({
         [`& .MuiDrawer-paper`]: { width: 240, boxSizing: "border-box" },
       }}
     >
-      <Toolbar />{" "}
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between", px: 2 }}>
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{ color: "primary.main", fontWeight: "bold" }}
+        >
+          {t("header.title") || "Chat"}
+        </Typography>
+
+        <LanguageSwitcher />
+      </Toolbar>
+
+      <Divider />
+
       <Box
         sx={{
           overflow: "auto",
@@ -51,10 +70,15 @@ export const ChatSidebar = ({
         </List>
 
         <Box sx={{ mt: "auto" }}>
-          {" "}
           <Divider />
-          <Button fullWidth onClick={onLogout} color="error" sx={{ p: 2 }}>
-            Logout
+          <Button
+            fullWidth
+            onClick={onLogout}
+            color="error"
+            startIcon={<LogoutIcon />}
+            sx={{ p: 2, borderRadius: 0 }}
+          >
+            {t("header.logout")}
           </Button>
         </Box>
       </Box>
