@@ -1,10 +1,10 @@
 import axios from "axios";
-import { SERVER_URL } from "../constants/index";
+import { API_BASE_URL } from "../constants/index";
 import type { AppStore } from "../store/index";
 import { logout } from "../store/authSlice";
 
 const http = axios.create({
-  baseURL: SERVER_URL,
+  baseURL: API_BASE_URL,
   headers: { "Content-Type": "application/json" },
 });
 
