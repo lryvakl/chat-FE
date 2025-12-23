@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
   Collapse,
@@ -9,10 +10,10 @@ import {
   Chip,
   Divider,
 } from "@mui/material";
-import { TransitionGroup } from "react-transition-group";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import EditIcon from "@mui/icons-material/Edit";
+import { TransitionGroup } from "react-transition-group";
+
 import type { MessageListProps } from "../types/interfaces";
 import {
   formatTime,

@@ -1,8 +1,9 @@
-import ChatPage from "./pages/ChatPage";
-import RegisterPage from "./pages/RegisterPage";
-import LoginPage from "./pages/LoginPage";
-import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+
+import ChatPage from "./pages/ChatPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import type { RootState } from "./store";
 import "./App.css";
 

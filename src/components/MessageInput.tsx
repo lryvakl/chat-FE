@@ -1,4 +1,6 @@
-import { useMemo } from "react";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import SendIcon from "@mui/icons-material/Send";
 import {
   TextField,
   Box,
@@ -7,10 +9,9 @@ import {
   alpha,
   FormHelperText,
 } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+
 import type { MessageInputProps } from "../types/interfaces";
 
 export const MessageInput = ({

@@ -1,5 +1,5 @@
-import type { Command } from "../commands/types";
 import { MAX_HISTORY_LENGTH } from "../../constants";
+import type { Command } from "../commands/types";
 
 export class ChatInvoker {
   private history: Command[] = [];

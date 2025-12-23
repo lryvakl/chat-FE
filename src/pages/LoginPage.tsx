@@ -1,6 +1,3 @@
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Box,
   Button,
@@ -11,11 +8,15 @@ import {
   Link,
   Container,
 } from "@mui/material";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { loginUser } from "../store/thunks/login";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
+
+import { LanguageSwitcher } from "../components/utils/LanguageSwitcher";
 import type { AppDispatch, RootState } from "../store";
 import { clearError } from "../store/authSlice";
-import { LanguageSwitcher } from "../components/utils/LanguageSwitcher";
+import { loginUser } from "../store/thunks/login";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");

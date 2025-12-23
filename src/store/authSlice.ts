@@ -1,8 +1,9 @@
 import { createSlice, isAnyOf } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { AuthState, AuthResponse } from "../types/interfaces";
-import { registerUser } from "../store/thunks/register";
+
 import { loginUser } from "../store/thunks/login";
+import { registerUser } from "../store/thunks/register";
+import type { AuthState, AuthResponse } from "../types/interfaces";
 
 const initialState: AuthState = {
   user: null,

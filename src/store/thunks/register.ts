@@ -1,4 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+
 import { authApi } from "../../api/authApi";
 import type { AuthCredentials } from "../../types/interfaces";
 

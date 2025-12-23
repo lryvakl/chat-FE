@@ -1,8 +1,3 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import type { AppDispatch, RootState } from "../store";
 import {
   Typography,
   TextField,
@@ -11,8 +6,14 @@ import {
   Button,
   Alert,
 } from "@mui/material";
-import { registerUser } from "../store/thunks/register";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, Link } from "react-router-dom";
+
 import { LanguageSwitcher } from "../components/utils/LanguageSwitcher";
+import type { AppDispatch, RootState } from "../store";
+import { registerUser } from "../store/thunks/register";
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");

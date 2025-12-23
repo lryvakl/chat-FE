@@ -1,3 +1,4 @@
+import LogoutIcon from "@mui/icons-material/Logout";
 import {
   Drawer,
   Toolbar,
@@ -10,9 +11,9 @@ import {
   Button,
   Typography,
 } from "@mui/material";
-import LogoutIcon from "@mui/icons-material/Logout";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+
 import type { ChatSidebarProps } from "../types/interfaces";
 import { LanguageSwitcher } from "./utils/LanguageSwitcher";
 

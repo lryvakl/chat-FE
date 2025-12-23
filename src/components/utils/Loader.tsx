@@ -1,4 +1,5 @@
 import { Box, CircularProgress, Typography } from "@mui/material";
+
 import type { LoaderProps } from "../../types/interfaces";
 
 export const Loader = ({ fullScreen = false, message }: LoaderProps) => {

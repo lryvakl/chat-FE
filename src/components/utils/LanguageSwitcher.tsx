@@ -1,4 +1,5 @@
-import { useState } from "react";
+import CheckIcon from "@mui/icons-material/Check";
+import LanguageIcon from "@mui/icons-material/Language";
 import {
   IconButton,
   Menu,
@@ -7,8 +8,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import LanguageIcon from "@mui/icons-material/Language";
-import CheckIcon from "@mui/icons-material/Check";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export const LanguageSwitcher = () => {

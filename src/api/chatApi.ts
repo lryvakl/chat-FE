@@ -1,5 +1,5 @@
-import type { Message } from "../types/interfaces";
 import { API_BASE_URL } from "../constants/index";
+import type { Message } from "../types/interfaces";
 
 export const chatApi = {
   async getRecentMessages(room: string): Promise<Message[]> {

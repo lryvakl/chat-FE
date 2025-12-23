@@ -1,6 +1,3 @@
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -10,18 +7,22 @@ import {
   Paper,
   Alert,
 } from "@mui/material";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+
+import { ChatSidebar } from "../components/ChatSidebar";
+import MessageInput from "../components/MessageInput";
+import MessageList from "../components/MessageList";
+import { Loader } from "../components/utils/Loader";
+import { useChat } from "../hooks/useChat";
 import type { AppDispatch, RootState } from "../store";
+import { logout } from "../store/authSlice";
 import { setRoom } from "../store/chatSlice";
 import { fetchMessages } from "../store/thunks/fetchMessages";
-import type { Message } from "../types/interfaces";
-import { useChat } from "../hooks/useChat";
-import MessageList from "../components/MessageList";
-import MessageInput from "../components/MessageInput";
-import { ChatSidebar } from "../components/ChatSidebar";
 import { Room } from "../types/enums";
-import { logout } from "../store/authSlice";
-import { Loader } from "../components/utils/Loader";
+import type { Message } from "../types/interfaces";
 
 const ChatPage = () => {
   const { sendMessage, deleteMessage, editMessage, currentUser } = useChat();

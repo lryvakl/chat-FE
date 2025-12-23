@@ -1,7 +1,8 @@
 import { Socket } from "socket.io-client";
+
 import type { Command } from "./types";
-import { SocketEvent } from "../../types/enums";
 import type { JoinRoomPayload } from "./types";
+import { SocketEvent } from "../../types/enums";
 
 export class JoinRoomCommand implements Command {
   constructor(
