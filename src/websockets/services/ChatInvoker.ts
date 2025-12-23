@@ -1,4 +1,5 @@
 import type { Command } from "../commands/types";
+import { MAX_HISTORY_LENGTH } from "../../constants";
 
 export class ChatInvoker {
   private history: Command[] = [];
@@ -6,7 +7,7 @@ export class ChatInvoker {
   executeCommand(command: Command) {
     command.execute();
     this.history.push(command);
-    if (this.history.length > 50) {
+    if (this.history.length > MAX_HISTORY_LENGTH) {
       this.history.shift();
     }
   }
