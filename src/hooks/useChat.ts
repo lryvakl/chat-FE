@@ -1,12 +1,14 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { socket } from "../api/socket";
+import { socketService } from "../websockets/services/WebSocketManager";
 import type { RootState } from "../store";
 import { addMessage, removeMessage, updateMessage } from "../store/chatSlice";
 import type { Message, ServerError } from "../types/interfaces";
 import { SocketEvent } from "../types/enums";
 
 import { ChatInvoker } from "../websockets/services/ChatInvoker";
+import { JoinRoomCommand } from "../websockets/commands/JoinRoomCommand";
+import { LeaveRoomCommand } from "../websockets/commands/LeaveRoomCommand";
 import { SendMessageCommand } from "../websockets/commands/SendMessageCommand";
 import { DeleteMessageCommand } from "../websockets/commands/DeleteMessageCommand";
 import { EditMessageCommand } from "../websockets/commands/EditMessageCommand";
@@ -18,95 +20,115 @@ export const useChat = () => {
   const currentRoom = useSelector((state: RootState) => state.chat.currentRoom);
   const messages = useSelector((state: RootState) => state.chat.messages);
   const invoker = useMemo(() => new ChatInvoker(), []);
+  const socket = socketService.rawSocket;
 
   useEffect(() => {
-    if (token) {
-      socket.auth = { token };
-      socket.connect();
-    } else {
+    if (!token || !socket) return;
+
+    socketService.connect(token);
+
+    const handlers = {
+      [SocketEvent.ReceiveMessage]: (msg: Message) => dispatch(addMessage(msg)),
+      [SocketEvent.MessageDeleted]: (id: number) => dispatch(removeMessage(id)),
+      [SocketEvent.MessageUpdated]: (msg: Message) =>
+        dispatch(updateMessage(msg)),
+      [SocketEvent.ConnectionError]: (err: Error | ServerError) =>
+        console.error("Socket Error:", err),
+    };
+
+    Object.entries(handlers).forEach(([event, handler]) =>
+      socket.on(event, handler)
+    );
+
+    return () => {
+      Object.entries(handlers).forEach(([event, handler]) =>
+        socket.off(event, handler)
+      );
+    };
+  }, [dispatch, token, socket]);
+
+  useEffect(() => {
+    if (!currentUser || !currentRoom || !socket) {
       return;
     }
 
-    const handleReceiveMessage = (message: Message) => {
-      dispatch(addMessage(message));
-    };
+    const joinCommand = new JoinRoomCommand(socket, {
+      username: currentUser,
+      room: currentRoom,
+    });
 
-    const handleDeleteMessage = (messageId: number) => {
-      dispatch(removeMessage(messageId));
-    };
-
-    const handleEditMessage = (message: Message) => {
-      dispatch(updateMessage(message));
-    };
-
-    const handleError = (error: Error | ServerError) => {
-      console.error(error.message);
-    };
-
-    socket.on(SocketEvent.ReceiveMessage, handleReceiveMessage);
-    socket.on(SocketEvent.MessageDeleted, handleDeleteMessage);
-    socket.on(SocketEvent.MessageUpdated, handleEditMessage);
-    socket.on(SocketEvent.ConnectionError, handleError);
-    socket.on(SocketEvent.Exception, handleError);
+    joinCommand.execute();
 
     return () => {
-      socket.off(SocketEvent.ReceiveMessage, handleReceiveMessage);
-      socket.off(SocketEvent.MessageDeleted, handleDeleteMessage);
-      socket.off(SocketEvent.MessageUpdated, handleEditMessage);
-      socket.off(SocketEvent.ConnectionError, handleError);
-      socket.off(SocketEvent.Exception, handleError);
-      socket.disconnect();
+      const leaveCommand = new LeaveRoomCommand(socket, {
+        username: currentUser,
+        room: currentRoom,
+      });
+
+      leaveCommand.execute();
     };
-  }, [dispatch, token]);
+  }, [currentUser, currentRoom, socket]);
 
-  useEffect(() => {
-    if (currentUser && currentRoom) {
-      socket.emit(SocketEvent.JoinRoom, {
-        username: currentUser,
-        room: currentRoom,
-      });
-    }
-  }, [currentUser, currentRoom]);
-
-  const sendMessage = (text: string) => {
-    if (currentUser && currentRoom) {
-      const command = new SendMessageCommand(socket, {
-        room: currentRoom,
-        username: currentUser,
-        text,
-      });
-      invoker.executeCommand(command);
-    }
-  };
-
-  const deleteMessage = (messageId: number) => {
-    if (currentUser && currentRoom) {
-      const command = new DeleteMessageCommand(socket, {
-        messageId,
-        room: currentRoom,
-        username: currentUser,
-      });
-      invoker.executeCommand(command);
-    }
-  };
-
-  const editMessage = (messageId: number, newText: string) => {
-    const messageToEdit = messages.find((m) => m.id === messageId);
-    const oldText = messageToEdit?.text || "";
-    if (currentUser && currentRoom) {
-      const command = new EditMessageCommand(
-        socket,
-        {
-          messageId,
-          text: newText,
+  const sendMessage = useCallback(
+    (text: string) => {
+      if (currentUser && currentRoom) {
+        const command = new SendMessageCommand(socket, {
           room: currentRoom,
           username: currentUser,
-        },
-        oldText
-      );
-      invoker.executeCommand(command);
-    }
-  };
+          text,
+        });
+        invoker.executeCommand(command);
+      }
+    },
+    [currentUser, currentRoom, socket, invoker]
+  );
 
-  return { sendMessage, deleteMessage, editMessage, currentUser, currentRoom };
+  const deleteMessage = useCallback(
+    (messageId: number) => {
+      if (currentUser && currentRoom) {
+        const command = new DeleteMessageCommand(socket, {
+          messageId,
+          room: currentRoom,
+          username: currentUser,
+        });
+        invoker.executeCommand(command);
+      }
+    },
+    [currentUser, currentRoom, socket, invoker]
+  );
+
+  const editMessage = useCallback(
+    (messageId: number, newText: string) => {
+      const messageToEdit = messages.find((m) => m.id === messageId);
+      const oldText = messageToEdit?.text || "";
+      if (currentUser && currentRoom) {
+        const command = new EditMessageCommand(
+          socket,
+          {
+            messageId,
+            text: newText,
+            room: currentRoom,
+            username: currentUser,
+          },
+          oldText
+        );
+        invoker.executeCommand(command);
+      }
+    },
+    [currentUser, currentRoom, socket, invoker, messages]
+  );
+
+  const undo = useCallback(() => {
+    invoker.undoLastCommand();
+  }, [invoker]);
+
+  return {
+    sendMessage,
+    deleteMessage,
+    editMessage,
+    undo,
+    currentUser,
+    currentRoom,
+    messages,
+  };
 };

@@ -1,6 +1,6 @@
 import { Socket } from "socket.io-client";
 import type { Command } from "./types";
-import type { SendMessagePayload } from "../types";
+import type { SendMessagePayload } from "./types";
 import { SocketEvent } from "../../types/enums";
 
 export class SendMessageCommand implements Command {

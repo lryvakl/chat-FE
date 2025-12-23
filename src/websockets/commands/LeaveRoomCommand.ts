@@ -1,0 +1,14 @@
+import { Socket } from "socket.io-client";
+import type { Command } from "./types";
+import type { LeaveRoomPayload } from "./types";
+
+export class LeaveRoomCommand implements Command {
+  constructor(
+    private socket: Socket,
+    private payload: LeaveRoomPayload
+  ) {}
+
+  execute(): void {
+    this.socket.emit("leaveRoom", this.payload);
+  }
+}
