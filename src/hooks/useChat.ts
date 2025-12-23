@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { socket } from "../api/socket";
 import type { RootState } from "../store";
@@ -6,11 +6,18 @@ import { addMessage, removeMessage, updateMessage } from "../store/chatSlice";
 import type { Message, ServerError } from "../types/interfaces";
 import { SocketEvent } from "../types/enums";
 
+import { ChatInvoker } from "../websockets/services/ChatInvoker";
+import { SendMessageCommand } from "../websockets/commands/SendMessageCommand";
+import { DeleteMessageCommand } from "../websockets/commands/DeleteMessageCommand";
+import { EditMessageCommand } from "../websockets/commands/EditMessageCommand";
+
 export const useChat = () => {
   const dispatch = useDispatch();
   const { user, token } = useSelector((state: RootState) => state.auth);
   const currentUser = user?.username || "";
   const currentRoom = useSelector((state: RootState) => state.chat.currentRoom);
+  const messages = useSelector((state: RootState) => state.chat.messages);
+  const invoker = useMemo(() => new ChatInvoker(), []);
 
   useEffect(() => {
     if (token) {
@@ -62,32 +69,43 @@ export const useChat = () => {
   }, [currentUser, currentRoom]);
 
   const sendMessage = (text: string) => {
-    if (currentUser) {
-      const messagePayload = {
-        username: currentUser,
-        text: text,
+    if (currentUser && currentRoom) {
+      const command = new SendMessageCommand(socket, {
         room: currentRoom,
-      };
-      socket.emit(SocketEvent.SendMessage, messagePayload);
+        username: currentUser,
+        text,
+      });
+      invoker.executeCommand(command);
     }
   };
 
   const deleteMessage = (messageId: number) => {
-    const payload = {
-      messageId,
-      room: currentRoom,
-      username: currentUser,
-    };
-    socket.emit(SocketEvent.DeleteMessage, payload);
+    if (currentUser && currentRoom) {
+      const command = new DeleteMessageCommand(socket, {
+        messageId,
+        room: currentRoom,
+        username: currentUser,
+      });
+      invoker.executeCommand(command);
+    }
   };
 
   const editMessage = (messageId: number, newText: string) => {
-    socket.emit(SocketEvent.EditMessage, {
-      messageId: messageId,
-      text: newText,
-      room: currentRoom,
-      username: currentUser,
-    });
+    const messageToEdit = messages.find((m) => m.id === messageId);
+    const oldText = messageToEdit?.text || "";
+    if (currentUser && currentRoom) {
+      const command = new EditMessageCommand(
+        socket,
+        {
+          messageId,
+          text: newText,
+          room: currentRoom,
+          username: currentUser,
+        },
+        oldText
+      );
+      invoker.executeCommand(command);
+    }
   };
 
   return { sendMessage, deleteMessage, editMessage, currentUser, currentRoom };
