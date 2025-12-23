@@ -71,28 +71,28 @@ export const useChat = () => {
 
   const sendMessage = useCallback(
     (text: string) => {
-      if (currentUser && currentRoom) {
-        const command = new SendMessageCommand(socket, {
-          room: currentRoom,
-          username: currentUser,
-          text,
-        });
-        invoker.executeCommand(command);
-      }
+      if (!currentUser || !currentRoom) return;
+
+      const command = new SendMessageCommand(socket, {
+        room: currentRoom,
+        username: currentUser,
+        text,
+      });
+      invoker.executeCommand(command);
     },
     [currentUser, currentRoom, socket, invoker]
   );
 
   const deleteMessage = useCallback(
     (messageId: number) => {
-      if (currentUser && currentRoom) {
-        const command = new DeleteMessageCommand(socket, {
-          messageId,
-          room: currentRoom,
-          username: currentUser,
-        });
-        invoker.executeCommand(command);
-      }
+      if (!currentUser || !currentRoom) return;
+
+      const command = new DeleteMessageCommand(socket, {
+        messageId,
+        room: currentRoom,
+        username: currentUser,
+      });
+      invoker.executeCommand(command);
     },
     [currentUser, currentRoom, socket, invoker]
   );
@@ -101,19 +101,21 @@ export const useChat = () => {
     (messageId: number, newText: string) => {
       const messageToEdit = messages.find((m) => m.id === messageId);
       const oldText = messageToEdit?.text || "";
-      if (currentUser && currentRoom) {
-        const command = new EditMessageCommand(
-          socket,
-          {
-            messageId,
-            text: newText,
-            room: currentRoom,
-            username: currentUser,
-          },
-          oldText
-        );
-        invoker.executeCommand(command);
-      }
+
+      if (!currentUser || !currentRoom) return;
+      if (!messageToEdit) return;
+
+      const command = new EditMessageCommand(
+        socket,
+        {
+          messageId,
+          text: newText,
+          room: currentRoom,
+          username: currentUser,
+        },
+        oldText
+      );
+      invoker.executeCommand(command);
     },
     [currentUser, currentRoom, socket, invoker, messages]
   );
