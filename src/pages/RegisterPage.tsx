@@ -12,6 +12,7 @@ import {
   Alert,
 } from "@mui/material";
 import { registerUser } from "../store/thunks/register";
+import { LanguageSwitcher } from "../components/utils/LanguageSwitcher";
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
@@ -36,15 +37,28 @@ const RegisterPage = () => {
   };
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="100vh"
-      bgcolor="#f0f2f5"
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        bgcolor: "#f0f2f5",
+        position: "relative",
+      }}
     >
+      <Box
+        sx={{
+          position: "fixed",
+          top: 20,
+          right: 20,
+          zIndex: 1000,
+        }}
+      >
+        <LanguageSwitcher />
+      </Box>
       <Paper elevation={3} sx={{ p: 4, width: 350 }}>
         <Typography variant="h5" mb={2} textAlign="center" fontWeight="bold">
-         {t('auth.registration')}
+          {t("auth.registration")}
         </Typography>
 
         {error && (
@@ -56,14 +70,14 @@ const RegisterPage = () => {
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label={t('auth.username')}
+            label={t("auth.username")}
             margin="normal"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
           <TextField
             fullWidth
-           label={t('auth.password')}
+            label={t("auth.password")}
             type="password"
             margin="normal"
             value={password}
@@ -76,18 +90,18 @@ const RegisterPage = () => {
             sx={{ mt: 2, py: 1.2 }}
             disabled={isLoading}
           >
-            {isLoading ? t('auth.signingUp') : t('auth.signUp')}
+            {isLoading ? t("auth.signingUp") : t("auth.signUp")}
           </Button>
         </form>
 
         <Box mt={2} textAlign="center">
           <Typography variant="body2">
-           { t('auth.haveAnAccount')}{" "} 
+            {t("auth.haveAnAccount")}{" "}
             <Link
               to="/login"
               style={{ textDecoration: "none", color: "#1976d2" }}
             >
-             { t('auth.login')}
+              {t("auth.login")}
             </Link>
           </Typography>
         </Box>

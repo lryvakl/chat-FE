@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { loginUser } from "../store/thunks/login";
 import type { AppDispatch, RootState } from "../store";
 import { clearError } from "../store/authSlice";
+import { LanguageSwitcher } from "../components/utils/LanguageSwitcher";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -53,8 +54,19 @@ const LoginPage = () => {
         alignItems: "center",
         minHeight: "100vh",
         bgcolor: "#f0f2f5",
+        position: "relative",
       }}
     >
+      <Box
+        sx={{
+          position: "fixed",
+          top: 20,
+          right: 20,
+          zIndex: 1000,
+        }}
+      >
+        <LanguageSwitcher />
+      </Box>
       <Container maxWidth="xs">
         <Paper
           elevation={3}
@@ -69,7 +81,6 @@ const LoginPage = () => {
           <Typography component="h1" variant="h5" fontWeight="bold" mb={3}>
             {t("auth.login")}
           </Typography>
-
           {error && (
             <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
               {error}
