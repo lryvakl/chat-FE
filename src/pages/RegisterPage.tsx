@@ -76,7 +76,7 @@ const RegisterPage = () => {
             sx={{ mt: 2, py: 1.2 }}
             disabled={isLoading}
           >
-            {isLoading ? t('auth.signingUp...') : t('auth.signUp')}
+            {isLoading ? t('auth.signingUp') : t('auth.signUp')}
           </Button>
         </form>
 

@@ -40,7 +40,7 @@ export const ChatSidebar = ({
           component="div"
           sx={{ color: "primary.main", fontWeight: "bold" }}
         >
-          {t("header.title") || "Chat"}
+          {t("header.title")}
         </Typography>
 
         <LanguageSwitcher />

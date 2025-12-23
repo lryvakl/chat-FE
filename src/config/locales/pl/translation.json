@@ -9,11 +9,11 @@
     "username": "Nazwa użytkownika",
     "password": "Hasło",
     "signIn": "Zaloguj się",
-    "signingIn...": "Logowanie...",
+    "signingIn": "Logowanie...",
     "offerToRegister": "Nie masz jeszcze konta?",
     "haveAnAccount": "Masz już konto?",
     "signUp": "Zarejestruj się",
-    "signingUp...": "Rejestracja...",
+    "signingUp": "Rejestracja...",
     "placeholder": "Wpisz swoje imię"
   },
   "chat": {

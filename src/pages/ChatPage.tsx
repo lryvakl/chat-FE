@@ -97,7 +97,7 @@ const ChatPage = () => {
         <AppBar position="static" color="default" elevation={1}>
           <Toolbar>
             <Typography variant="h6" sx={{ flexGrow: 1 }}>
-              {room ? `${t("chat.room")}: ${room}` : "Select a room"}
+              {`${t("chat.room")}: ${room}`}
             </Typography>
             <Typography variant="subtitle2" color="text.secondary">
               {t("chat.currentUser")}: <b>{currentUser}</b>

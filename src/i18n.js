@@ -24,7 +24,6 @@ i18n
     fallbackLng: "uk",
     detection: {
       order: ["localStorage", "cookie", "navigator"],
-
       caches: ["localStorage"],
     },
     interpolation: {

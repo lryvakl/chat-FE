@@ -109,7 +109,7 @@ const LoginPage = () => {
               sx={{ mt: 3, mb: 2, py: 1.2 }}
               disabled={isLoading || !username || !password}
             >
-              {isLoading ? t("auth.signingIn...") : t("auth.signIn")}
+              {isLoading ? t("auth.signingIn") : t("auth.signIn")}
             </Button>
 
             <Box textAlign="center">

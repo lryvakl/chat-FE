@@ -9,11 +9,11 @@
     "username": "Ім'я",
     "password": "Пароль",
     "signIn": "Увійти",
-    "signingIn...": "Вхід...",
+    "signingIn": "Вхід...",
     "offerToRegister": "Ще не маєте акаунту?",
     "haveAnAccount": "Вже маєте акаунт?",
     "signUp": "Зареєструватися",
-    "signingUp...": "Реєстрація...",
+    "signingUp": "Реєстрація...",
     "placeholder": "Введіть ваше ім'я"
   },
   "chat": {
