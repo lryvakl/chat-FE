@@ -1,0 +1,28 @@
+{
+  "header": {
+    "title": "Чат",
+    "logout": "Вийти"
+  },
+  "auth": {
+    "login": "Увійти",
+    "registration": "Реєстрація",
+    "username": "Ім'я",
+    "password": "Пароль",
+    "signIn": "Увійти",
+    "signingIn": "Вхід...",
+    "offerToRegister": "Ще не маєте акаунту?",
+    "haveAnAccount": "Вже маєте акаунт?",
+    "signUp": "Зареєструватися",
+    "signingUp": "Реєстрація...",
+    "placeholder": "Введіть ваше ім'я"
+  },
+  "chat": {
+    "typeMessage": "Напишіть повідомлення...",
+    "editMessage": "Відредагуйте повідомлення...",
+    "room": "Кімната",
+    "currentUser": "Користувач",
+    "today": "Сьогодні",
+    "yesterday": "Вчора",
+    "loading": "Завантаження"
+  }
+}

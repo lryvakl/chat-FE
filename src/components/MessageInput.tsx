@@ -10,6 +10,7 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from "react-i18next";
 import type { MessageInputProps } from "../types/interfaces";
 
 export const MessageInput = ({
@@ -21,6 +22,8 @@ export const MessageInput = ({
   setText,
 }: MessageInputProps) => {
   const theme = useTheme();
+  const { t } = useTranslation();
+
   const MAX_LENGTH = 800;
 
   const isLimitReached = useMemo(() => text.length >= MAX_LENGTH, [text]);
@@ -63,7 +66,7 @@ export const MessageInput = ({
         <TextField
           fullWidth
           variant="outlined"
-          placeholder={editingMessage ? "Edit message..." : "Type a message..."}
+          placeholder={editingMessage ? t('chat.editMessage') : t('chat.typeMessage')}
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}

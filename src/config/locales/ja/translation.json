@@ -1,0 +1,28 @@
+{
+  "header": {
+    "title": "チャット",
+    "logout": "ログアウト"
+  },
+  "auth": {
+    "login": "ログイン",
+    "registration": "新規登録",
+    "username": "ユーザー名",
+    "password": "パスワード",
+    "signIn": "ログイン",
+    "signingIn": "ログイン中...",
+    "offerToRegister": "アカウントをお持ちでないですか？",
+    "haveAnAccount": "すでにアカウントをお持ちですか？",
+    "signUp": "登録する",
+    "signingUp": "登録中...",
+    "placeholder": "名前を入力してください"
+  },
+  "chat": {
+    "typeMessage": "メッセージを入力...",
+    "editMessage": "メッセージを編集...",
+    "room": "ルーム",
+    "currentUser": "ユーザー",
+    "today": "今日",
+    "yesterday": "昨日",
+    "loading": "読み込み中"
+  }
+}

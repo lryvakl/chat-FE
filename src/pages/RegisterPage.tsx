@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { AppDispatch, RootState } from "../store";
 import {
   Typography,
@@ -15,6 +16,7 @@ import { registerUser } from "../store/thunks/register";
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { t } = useTranslation();
   const { token, isLoading, error } = useSelector(
     (state: RootState) => state.auth
   );
@@ -42,7 +44,7 @@ const RegisterPage = () => {
     >
       <Paper elevation={3} sx={{ p: 4, width: 350 }}>
         <Typography variant="h5" mb={2} textAlign="center" fontWeight="bold">
-          Create Account
+         {t('auth.registration')}
         </Typography>
 
         {error && (
@@ -54,14 +56,14 @@ const RegisterPage = () => {
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label="Username"
+            label={t('auth.username')}
             margin="normal"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
           <TextField
             fullWidth
-            label="Password"
+           label={t('auth.password')}
             type="password"
             margin="normal"
             value={password}
@@ -74,18 +76,18 @@ const RegisterPage = () => {
             sx={{ mt: 2, py: 1.2 }}
             disabled={isLoading}
           >
-            {isLoading ? "Creating..." : "Sign Up"}
+            {isLoading ? t('auth.signingUp') : t('auth.signUp')}
           </Button>
         </form>
 
         <Box mt={2} textAlign="center">
           <Typography variant="body2">
-            Already have an account?{" "}
+           { t('auth.haveAnAccount')}{" "} 
             <Link
               to="/login"
               style={{ textDecoration: "none", color: "#1976d2" }}
             >
-              Login
+             { t('auth.login')}
             </Link>
           </Typography>
         </Box>

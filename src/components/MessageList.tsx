@@ -10,10 +10,15 @@ import {
   Divider,
 } from "@mui/material";
 import { TransitionGroup } from "react-transition-group";
+import { useTranslation } from "react-i18next";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import type { MessageListProps } from "../types/interfaces";
-import { formatTime, isSameDay, formatDateSeparator } from "../utils/dateFormatters";
+import {
+  formatTime,
+  isSameDay,
+  formatDateSeparator,
+} from "../utils/dateFormatters";
 
 export const MessageList = ({
   messages,
@@ -22,6 +27,7 @@ export const MessageList = ({
   onEditMessage,
 }: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { t, i18n } = useTranslation();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -54,7 +60,7 @@ export const MessageList = ({
               {showDateSeparator && msg.createdAt && (
                 <Divider sx={{ my: 2, opacity: 0.6 }}>
                   <Chip
-                    label={formatDateSeparator(msg.createdAt)}
+                    label={formatDateSeparator(msg.createdAt, t, i18n.language)}
                     size="small"
                     sx={{
                       backgroundColor: "grey.200",
