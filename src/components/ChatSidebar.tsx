@@ -11,11 +11,14 @@ import {
   Button,
   Typography,
 } from "@mui/material";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import type { ChatSidebarProps } from "../types/interfaces";
 import { LanguageSwitcher } from "./utils/LanguageSwitcher";
+import { TourButton } from "./utils/TourButton";
+import { getChatSteps } from "../constants/steps";
 
 export const ChatSidebar = ({
   rooms,
@@ -24,6 +27,7 @@ export const ChatSidebar = ({
 }: ChatSidebarProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const chatSteps = useMemo(() => getChatSteps(t), [t]);
 
   return (
     <Drawer
@@ -43,7 +47,7 @@ export const ChatSidebar = ({
         >
           {t("header.title")}
         </Typography>
-
+        <TourButton steps={chatSteps} />
         <LanguageSwitcher />
       </Toolbar>
 
@@ -57,7 +61,7 @@ export const ChatSidebar = ({
           height: "100%",
         }}
       >
-        <List>
+        <List id="room-list">
           {rooms.map((text) => (
             <ListItem key={text} disablePadding>
               <ListItemButton

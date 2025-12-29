@@ -8,12 +8,14 @@ import {
   Link,
   Container,
 } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 
 import { LanguageSwitcher } from "../components/utils/LanguageSwitcher";
+import { TourButton } from "../components/utils/TourButton";
+import { getLoginSteps } from "../constants/steps";
 import type { AppDispatch, RootState } from "../store";
 import { clearError } from "../store/authSlice";
 import { loginUser } from "../store/thunks/login";
@@ -22,6 +24,7 @@ const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { t } = useTranslation();
+  const loginSteps = useMemo(() => getLoginSteps(t), [t]);
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -66,6 +69,7 @@ const LoginPage = () => {
           zIndex: 1000,
         }}
       >
+        <TourButton steps={loginSteps} />
         <LanguageSwitcher />
       </Box>
       <Container maxWidth="xs">

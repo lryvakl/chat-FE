@@ -65,9 +65,12 @@ export const MessageInput = ({
         }}
       >
         <TextField
+          id="message-input"
           fullWidth
           variant="outlined"
-          placeholder={editingMessage ? t('chat.editMessage') : t('chat.typeMessage')}
+          placeholder={
+            editingMessage ? t("chat.editMessage") : t("chat.typeMessage")
+          }
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -99,6 +102,7 @@ export const MessageInput = ({
         )}
 
         <IconButton
+          id="message-send"
           type="submit"
           disabled={!text.trim()}
           sx={{

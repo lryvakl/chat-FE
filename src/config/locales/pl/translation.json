@@ -23,6 +23,22 @@
     "currentUser": "Użytkownik",
     "today": "Dzisiaj",
     "yesterday": "Wczoraj",
-    "loading": "Załadunek"
+    "loading": "Załadunek",
+    "help": "Pomoc"
+  },
+  "tour": {
+    "next": "Dalej",
+    "previous": "Wstecz",
+    "close": "Rozumiem",
+    "language": "Język strony",
+    "switchLanguage": "Wybierz preferowany język",
+    "rooms": "Pokoje",
+    "selectRoom": "Wybierz pokój do rozmowy",
+    "writeMessages": "Wpisz wiadomość",
+    "send": "Wyślij wiadomość",
+    "enterUsername": "Wpisz nazwę użytkownika",
+    "enterPassword": "Wpisz hasło",
+    "createUsername": "Wpisz unikalną nazwę",
+    "createPassword": "Utwórz silne hasło (min. 6 znaków)"
   }
 }

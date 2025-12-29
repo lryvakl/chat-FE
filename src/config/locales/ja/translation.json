@@ -23,6 +23,22 @@
     "currentUser": "ユーザー",
     "today": "今日",
     "yesterday": "昨日",
-    "loading": "読み込み中"
+    "loading": "読み込み中",
+    "help": "ヘルプ"
+  },
+  "tour": {
+    "next": "次へ",
+    "previous": "前へ",
+    "close": "閉じる",
+    "language": "表示言語",
+    "switchLanguage": "言語を選択してください",
+    "rooms": "ルーム一覧",
+    "selectRoom": "チャットルームを選択",
+    "writeMessages": "メッセージを入力",
+    "send": "メッセージを送信",
+    "enterUsername": "ユーザー名を入力",
+    "enterPassword": "パスワードを入力",
+    "createUsername": "ユニークな名前を入力",
+    "createPassword": "強力なパスワードを作成（6文字以上）"
   }
 }

@@ -34,6 +34,7 @@ export const LanguageSwitcher = () => {
     <>
       <Tooltip title="Change Language">
         <IconButton
+          id="language-switcher"
           onClick={handleClick}
           size="small"
           aria-controls={open ? "language-menu" : undefined}

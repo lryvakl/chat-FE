@@ -6,12 +6,14 @@ import {
   Button,
   Alert,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 
 import { LanguageSwitcher } from "../components/utils/LanguageSwitcher";
+import { TourButton } from "../components/utils/TourButton";
+import { getRegisterSteps } from "../constants/steps";
 import type { AppDispatch, RootState } from "../store";
 import { registerUser } from "../store/thunks/register";
 
@@ -19,6 +21,8 @@ const RegisterPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { t } = useTranslation();
+  const registerSteps = useMemo(() => getRegisterSteps(t), [t]);
+
   const { token, isLoading, error } = useSelector(
     (state: RootState) => state.auth
   );
@@ -55,6 +59,7 @@ const RegisterPage = () => {
           zIndex: 1000,
         }}
       >
+        <TourButton steps={registerSteps} />
         <LanguageSwitcher />
       </Box>
       <Paper elevation={3} sx={{ p: 4, width: 350 }}>
@@ -71,6 +76,7 @@ const RegisterPage = () => {
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
+            id="username"
             label={t("auth.username")}
             margin="normal"
             value={username}
@@ -78,6 +84,7 @@ const RegisterPage = () => {
           />
           <TextField
             fullWidth
+            id="password"
             label={t("auth.password")}
             type="password"
             margin="normal"
