@@ -103,6 +103,7 @@ export const MessageInput = ({
 
         <IconButton
           id="message-send"
+          aria-label="send-message"
           type="submit"
           disabled={!text.trim()}
           sx={{
