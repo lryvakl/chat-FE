@@ -1,3 +1,4 @@
+import MenuIcon from "@mui/icons-material/Menu";
 import {
   AppBar,
   Toolbar,
@@ -6,6 +7,10 @@ import {
   Container,
   Paper,
   Alert,
+  IconButton,
+  Drawer,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -16,6 +21,7 @@ import { ChatSidebar } from "../components/ChatSidebar";
 import MessageInput from "../components/MessageInput";
 import MessageList from "../components/MessageList";
 import { Loader } from "../components/utils/Loader";
+import { PATHS } from "../constants/paths";
 import { useChat } from "../hooks/useChat";
 import type { AppDispatch, RootState } from "../store";
 import { logout } from "../store/authSlice";
@@ -28,9 +34,14 @@ const ChatPage = () => {
   const { sendMessage, deleteMessage, editMessage, currentUser } = useChat();
   const [inputText, setInputText] = useState("");
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const { room } = useParams();
   const { t } = useTranslation();
   const rooms = Object.values(Room);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const { messages, isLoading, error } = useSelector(
     (state: RootState) => state.chat
@@ -41,7 +52,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     if (!currentUser) {
-      navigate("/login");
+      navigate(PATHS.LOGIN);
     }
   }, [currentUser, navigate]);
 
@@ -51,6 +62,10 @@ const ChatPage = () => {
       dispatch(fetchMessages(room));
     }
   }, [room, dispatch]);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   const handleStartEdit = (message: Message) => {
     setEditingMessage(message);
@@ -77,14 +92,40 @@ const ChatPage = () => {
 
   const handleLeave = () => {
     dispatch(logout());
-    navigate("/login");
+    navigate(PATHS.LOGIN);
   };
 
   if (!currentUser) return null;
 
+  const sidebarContent = (
+    <ChatSidebar
+      rooms={rooms}
+      currentRoom={room}
+      onLogout={handleLeave}
+      onRoomSelect={() => isMobile && setMobileOpen(false)}
+    />
+  );
+
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
-      <ChatSidebar rooms={rooms} currentRoom={room} onLogout={handleLeave} />
+    <Box sx={{ display: "flex", height: "100vh", bgcolor: "#f5f5f5" }}>
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: "block", md: "none" },
+          "& .MuiDrawer-paper": { boxSizing: "border-box", width: 280 },
+        }}
+      >
+        {sidebarContent}
+      </Drawer>
+
+      <Box
+        sx={{ display: { xs: "none", md: "block" }, width: 280, flexShrink: 0 }}
+      >
+        {sidebarContent}
+      </Box>
 
       <Box
         component="main"
@@ -93,14 +134,33 @@ const ChatPage = () => {
           display: "flex",
           flexDirection: "column",
           height: "100vh",
+          width: { md: `calc(100% - 280px)` },
         }}
       >
         <AppBar position="static" color="default" elevation={1}>
-          <Toolbar>
-            <Typography variant="h6" sx={{ flexGrow: 1 }}>
-              {`${t("chat.room")}: ${room}`}
+          <Toolbar sx={{ px: { xs: 1, sm: 2 } }}>
+            <IconButton
+              aria-label="menu"
+              color="inherit"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { md: "none" } }}
+            >
+              <MenuIcon />
+            </IconButton>
+
+            <Typography
+              variant="h6"
+              sx={{ flexGrow: 1, fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
+            >
+              {isMobile ? room : `${t("chat.room")}: ${room}`}
             </Typography>
-            <Typography variant="subtitle2" color="text.secondary">
+
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              sx={{ display: { xs: "none", sm: "block" } }}
+            >
               {t("chat.currentUser")}: <b>{currentUser}</b>
             </Typography>
           </Toolbar>
@@ -108,24 +168,24 @@ const ChatPage = () => {
 
         <Container
           maxWidth="md"
+          disableGutters={isMobile}
           sx={{
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            py: 2,
+            py: { xs: 0, sm: 2 },
             overflow: "hidden",
           }}
         >
           <Paper
-            elevation={0}
+            elevation={isMobile ? 0 : 1}
             sx={{
               flexGrow: 1,
               display: "flex",
               flexDirection: "column",
               overflow: "hidden",
-              borderRadius: 2,
-              border: "1px solid #e0e0e0",
-              position: "relative",
+              borderRadius: isMobile ? 0 : 2,
+              border: isMobile ? "none" : "1px solid #e0e0e0",
             }}
           >
             {isLoading ? (
@@ -141,7 +201,7 @@ const ChatPage = () => {
                 sx={{
                   flexGrow: 1,
                   overflowY: "auto",
-                  p: 2,
+                  p: { xs: 1, sm: 2 },
                   bgcolor: "#fafafa",
                 }}
               >
@@ -155,7 +215,12 @@ const ChatPage = () => {
             )}
 
             <Box
-              sx={{ p: 2, bgcolor: "white", borderTop: "1px solid #e0e0e0" }}
+              sx={{
+                p: { xs: 1, sm: 2 },
+                bgcolor: "white",
+                borderTop: "1px solid #e0e0e0",
+                pb: isMobile ? "env(safe-area-inset-bottom)" : 2,
+              }}
             >
               <MessageInput
                 text={inputText}

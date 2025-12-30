@@ -18,6 +18,7 @@ export interface ChatSidebarProps {
   rooms: string[];
   currentRoom?: string;
   onLogout: () => void;
+  onRoomSelect: () => void;
 }
 
 export interface LoaderProps {

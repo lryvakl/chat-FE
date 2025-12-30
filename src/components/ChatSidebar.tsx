@@ -1,6 +1,5 @@
 import LogoutIcon from "@mui/icons-material/Logout";
 import {
-  Drawer,
   Toolbar,
   Box,
   List,
@@ -18,24 +17,35 @@ import { useNavigate } from "react-router-dom";
 import type { ChatSidebarProps } from "../types/interfaces";
 import { LanguageSwitcher } from "./utils/LanguageSwitcher";
 import { TourButton } from "./utils/TourButton";
+import { PATHS } from "../constants/paths";
 import { getChatSteps } from "../constants/steps";
 
 export const ChatSidebar = ({
   rooms,
   currentRoom,
   onLogout,
+  onRoomSelect,
 }: ChatSidebarProps) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const chatSteps = useMemo(() => getChatSteps(t), [t]);
 
+  const handleRoomClick = (roomName: string) => {
+    navigate(`${PATHS.CHAT}/${roomName}`);
+    if (onRoomSelect) {
+      onRoomSelect();
+    }
+  };
+
   return (
-    <Drawer
-      variant="permanent"
+    <Box
       sx={{
-        width: 240,
-        flexShrink: 0,
-        [`& .MuiDrawer-paper`]: { width: 240, boxSizing: "border-box" },
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        width: 280,
+        borderRight: "1px solid #e0e0e0",
+        bgcolor: "background.paper",
       }}
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between", px: 2 }}>
@@ -56,9 +66,9 @@ export const ChatSidebar = ({
       <Box
         sx={{
           overflow: "auto",
+          flexGrow: 1,
           display: "flex",
           flexDirection: "column",
-          height: "100%",
         }}
       >
         <List id="room-list">
@@ -66,7 +76,7 @@ export const ChatSidebar = ({
             <ListItem key={text} disablePadding>
               <ListItemButton
                 selected={currentRoom === text}
-                onClick={() => navigate(`/chat/${text}`)}
+                onClick={() => handleRoomClick(text)}
               >
                 <ListItemText primary={text} />
               </ListItemButton>
@@ -87,6 +97,6 @@ export const ChatSidebar = ({
           </Button>
         </Box>
       </Box>
-    </Drawer>
+    </Box>
   );
 };

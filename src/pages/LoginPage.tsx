@@ -15,10 +15,12 @@ import { useNavigate, Link as RouterLink } from "react-router-dom";
 
 import { LanguageSwitcher } from "../components/utils/LanguageSwitcher";
 import { TourButton } from "../components/utils/TourButton";
+import { PATHS } from "../constants/paths";
 import { getLoginSteps } from "../constants/steps";
 import type { AppDispatch, RootState } from "../store";
 import { clearError } from "../store/authSlice";
 import { loginUser } from "../store/thunks/login";
+import { Room } from "../types/enums";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -35,7 +37,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (token) {
-      navigate("/chat/General");
+      navigate(`${PATHS.CHAT}/${Room.General}`);
     }
   }, [token, navigate]);
 
