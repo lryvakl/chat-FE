@@ -11,6 +11,12 @@ export enum SocketEvent {
   Exception = "exception",
 }
 
+export enum PATHS {
+  CHAT = "/chat",
+  LOGIN = "/login",
+  REGISTER = "/register",
+}
+
 export enum Room {
   General = "General",
   Tech = "Tech",

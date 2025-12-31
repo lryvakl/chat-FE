@@ -1,12 +1,12 @@
 import { useSelector } from "react-redux";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 
-import { PATHS } from "./constants/paths";
 import ChatPage from "./pages/ChatPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import type { RootState } from "./store";
 import "./App.css";
+import { PATHS } from "./types/enums";
 import { Room } from "./types/enums";
 
 const ProtectedRoute = () => {

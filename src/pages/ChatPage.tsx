@@ -21,12 +21,12 @@ import { ChatSidebar } from "../components/ChatSidebar";
 import MessageInput from "../components/MessageInput";
 import MessageList from "../components/MessageList";
 import { Loader } from "../components/utils/Loader";
-import { PATHS } from "../constants/paths";
 import { useChat } from "../hooks/useChat";
 import type { AppDispatch, RootState } from "../store";
 import { logout } from "../store/authSlice";
 import { setRoom } from "../store/chatSlice";
 import { fetchMessages } from "../store/thunks/fetchMessages";
+import { PATHS } from "../types/enums";
 import { Room } from "../types/enums";
 import type { Message } from "../types/interfaces";
 

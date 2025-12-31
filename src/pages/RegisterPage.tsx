@@ -13,10 +13,10 @@ import { useNavigate, Link } from "react-router-dom";
 
 import { LanguageSwitcher } from "../components/utils/LanguageSwitcher";
 import { TourButton } from "../components/utils/TourButton";
-import { PATHS } from "../constants/paths";
 import { getRegisterSteps } from "../constants/steps";
 import type { AppDispatch, RootState } from "../store";
 import { registerUser } from "../store/thunks/register";
+import { PATHS } from "../types/enums";
 import { Room } from "../types/enums";
 
 const RegisterPage = () => {

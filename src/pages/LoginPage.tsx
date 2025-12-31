@@ -15,11 +15,11 @@ import { useNavigate, Link as RouterLink } from "react-router-dom";
 
 import { LanguageSwitcher } from "../components/utils/LanguageSwitcher";
 import { TourButton } from "../components/utils/TourButton";
-import { PATHS } from "../constants/paths";
 import { getLoginSteps } from "../constants/steps";
 import type { AppDispatch, RootState } from "../store";
 import { clearError } from "../store/authSlice";
 import { loginUser } from "../store/thunks/login";
+import { PATHS } from "../types/enums";
 import { Room } from "../types/enums";
 
 const LoginPage = () => {

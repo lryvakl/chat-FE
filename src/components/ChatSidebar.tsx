@@ -14,10 +14,10 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
+import { PATHS } from "../types/enums";
 import type { ChatSidebarProps } from "../types/interfaces";
 import { LanguageSwitcher } from "./utils/LanguageSwitcher";
 import { TourButton } from "./utils/TourButton";
-import { PATHS } from "../constants/paths";
 import { getChatSteps } from "../constants/steps";
 
 export const ChatSidebar = ({
