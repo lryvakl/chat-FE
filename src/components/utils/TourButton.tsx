@@ -1,6 +1,6 @@
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import { IconButton, Tooltip } from "@mui/material";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import type { DriveStep } from "driver.js";
+import { HelpCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useTour } from "../../hooks/useTour";
@@ -14,16 +14,23 @@ export const TourButton = ({ steps }: TourButtonProps) => {
   const { t } = useTranslation();
 
   return (
-    <Tooltip title={t("chat.help")}>
-      <IconButton
-        onClick={startTour}
-        sx={{
-          color: "#1976d2",
-          "&:hover": { bgcolor: "#f5f5f5" },
-        }}
-      >
-        <HelpOutlineIcon />
-      </IconButton>
-    </Tooltip>
+    <Tooltip.Provider delayDuration={300}>
+      <Tooltip.Root>
+        <Tooltip.Trigger asChild>
+          <button
+            className="icon-btn"
+            onClick={startTour}
+            aria-label={t("chat.help")}
+          >
+            <HelpCircle size={18} />
+          </button>
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content className="tooltip-content" sideOffset={6}>
+            {t("chat.help")}
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+    </Tooltip.Provider>
   );
 };

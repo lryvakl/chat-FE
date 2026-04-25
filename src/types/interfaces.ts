@@ -17,6 +17,7 @@ export interface MessageListProps {
 export interface ChatSidebarProps {
   rooms: string[];
   currentRoom?: string;
+  currentUser: string;
   onLogout: () => void;
   onRoomSelect: () => void;
 }

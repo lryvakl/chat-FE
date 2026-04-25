@@ -1,17 +1,4 @@
-import MenuIcon from "@mui/icons-material/Menu";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Box,
-  Container,
-  Paper,
-  Alert,
-  IconButton,
-  Drawer,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
+import { Hash, Menu } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,28 +7,28 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ChatSidebar } from "../components/ChatSidebar";
 import MessageInput from "../components/MessageInput";
 import MessageList from "../components/MessageList";
+import { AuroraBackground } from "../components/utils/AuroraBackground";
 import { Loader } from "../components/utils/Loader";
 import { useChat } from "../hooks/useChat";
 import type { AppDispatch, RootState } from "../store";
 import { logout } from "../store/authSlice";
 import { setRoom } from "../store/chatSlice";
 import { fetchMessages } from "../store/thunks/fetchMessages";
-import { PATHS } from "../types/enums";
-import { Room } from "../types/enums";
+import { stringToGradient } from "../theme";
+import { PATHS, Room } from "../types/enums";
 import type { Message } from "../types/interfaces";
+
+const SIDEBAR_W = 300;
 
 const ChatPage = () => {
   const { sendMessage, deleteMessage, editMessage, currentUser } = useChat();
   const [inputText, setInputText] = useState("");
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const { room } = useParams();
   const { t } = useTranslation();
   const rooms = Object.values(Room);
-
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const { messages, isLoading, error } = useSelector(
     (state: RootState) => state.chat
@@ -51,9 +38,7 @@ const ChatPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!currentUser) {
-      navigate(PATHS.LOGIN);
-    }
+    if (!currentUser) navigate(PATHS.LOGIN);
   }, [currentUser, navigate]);
 
   useEffect(() => {
@@ -62,10 +47,6 @@ const ChatPage = () => {
       dispatch(fetchMessages(room));
     }
   }, [room, dispatch]);
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
 
   const handleStartEdit = (message: Message) => {
     setEditingMessage(message);
@@ -80,7 +61,7 @@ const ChatPage = () => {
     setInputText("");
   };
 
-  const handleSendMessageWrapper = (text: string) => {
+  const handleSend = (text: string) => {
     sendMessage(text);
     setInputText("");
   };
@@ -97,144 +78,186 @@ const ChatPage = () => {
 
   if (!currentUser) return null;
 
-  const sidebarContent = (
+  const sidebar = (
     <ChatSidebar
       rooms={rooms}
       currentRoom={room}
+      currentUser={currentUser}
       onLogout={handleLeave}
-      onRoomSelect={() => isMobile && setMobileOpen(false)}
+      onRoomSelect={() => setDrawerOpen(false)}
     />
   );
 
   return (
-    <Box sx={{ display: "flex", height: "100vh", bgcolor: "#f5f5f5" }}>
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={handleDrawerToggle}
-        ModalProps={{ keepMounted: true }}
-        sx={{
-          display: { xs: "block", md: "none" },
-          "& .MuiDrawer-paper": { boxSizing: "border-box", width: 280 },
+    <div style={{ display: "flex", height: "100vh", position: "relative" }}>
+      <AuroraBackground />
+
+      {/* Mobile drawer */}
+      {drawerOpen && (
+        <>
+          <div
+            className="drawer-overlay"
+            onClick={() => setDrawerOpen(false)}
+          />
+          <div className="drawer-panel">{sidebar}</div>
+        </>
+      )}
+
+      {/* Desktop sidebar */}
+      <div
+        style={{
+          display: "none",
+          width: SIDEBAR_W,
+          flexShrink: 0,
+        }}
+        ref={(el) => {
+          if (!el) return;
+          const mq = window.matchMedia("(min-width: 768px)");
+          const update = (matches: boolean) => {
+            el.style.display = matches ? "block" : "none";
+          };
+          update(mq.matches);
+          mq.addEventListener("change", (e) => update(e.matches));
         }}
       >
-        {sidebarContent}
-      </Drawer>
+        {sidebar}
+      </div>
 
-      <Box
-        sx={{ display: { xs: "none", md: "block" }, width: 280, flexShrink: 0 }}
-      >
-        {sidebarContent}
-      </Box>
-
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
+      {/* Main area */}
+      <div
+        style={{
+          flex: 1,
           display: "flex",
           flexDirection: "column",
           height: "100vh",
-          width: { md: `calc(100% - 280px)` },
+          background: "rgba(255,255,255,0.35)",
+          backdropFilter: "blur(20px) saturate(160%)",
+          WebkitBackdropFilter: "blur(20px) saturate(160%)",
+          overflow: "hidden",
+        }}
+        // dark mode bg
+        ref={(el) => {
+          if (!el) return;
+          const update = () => {
+            const dark =
+              document.documentElement.getAttribute("data-theme") === "dark";
+            el.style.background = dark
+              ? "rgba(11,16,32,0.4)"
+              : "rgba(255,255,255,0.35)";
+          };
+          update();
+          const observer = new MutationObserver(update);
+          observer.observe(document.documentElement, { attributes: true });
         }}
       >
-        <AppBar position="static" color="default" elevation={1}>
-          <Toolbar sx={{ px: { xs: 1, sm: 2 } }}>
-            <IconButton
-              aria-label="menu"
-              color="inherit"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { md: "none" } }}
-            >
-              <MenuIcon />
-            </IconButton>
-
-            <Typography
-              variant="h6"
-              sx={{ flexGrow: 1, fontSize: { xs: "1.1rem", sm: "1.25rem" } }}
-            >
-              {isMobile ? room : `${t("chat.room")}: ${room}`}
-            </Typography>
-
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              sx={{ display: { xs: "none", sm: "block" } }}
-            >
-              {t("chat.currentUser")}: <b>{currentUser}</b>
-            </Typography>
-          </Toolbar>
-        </AppBar>
-
-        <Container
-          maxWidth="md"
-          disableGutters={isMobile}
-          sx={{
-            flexGrow: 1,
+        {/* AppBar */}
+        <div
+          className="appbar"
+          style={{
             display: "flex",
-            flexDirection: "column",
-            py: { xs: 0, sm: 2 },
-            overflow: "hidden",
+            alignItems: "center",
+            gap: "0.75rem",
+            padding: "0 1.25rem",
+            height: 64,
+            flexShrink: 0,
           }}
         >
-          <Paper
-            elevation={isMobile ? 0 : 1}
-            sx={{
-              flexGrow: 1,
-              display: "flex",
-              flexDirection: "column",
-              overflow: "hidden",
-              borderRadius: isMobile ? 0 : 2,
-              border: isMobile ? "none" : "1px solid #e0e0e0",
+          <button
+            className="icon-btn"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open menu"
+            style={{ display: "block" }}
+            ref={(el) => {
+              if (!el) return;
+              const mq = window.matchMedia("(min-width: 768px)");
+              const update = (matches: boolean) => {
+                el.style.display = matches ? "none" : "flex";
+              };
+              update(mq.matches);
+              mq.addEventListener("change", (e) => update(e.matches));
             }}
           >
-            {isLoading ? (
-              <Box sx={{ flexGrow: 1 }}>
-                <Loader fullScreen={false} message={t("chat.loading")} />
-              </Box>
-            ) : error ? (
-              <Box p={3}>
-                <Alert severity="error">{error}</Alert>
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  flexGrow: 1,
-                  overflowY: "auto",
-                  p: { xs: 1, sm: 2 },
-                  bgcolor: "#fafafa",
-                }}
-              >
-                <MessageList
-                  messages={messages}
-                  currentUser={currentUser}
-                  onDeleteMessage={deleteMessage}
-                  onEditMessage={handleStartEdit}
-                />
-              </Box>
-            )}
+            <Menu size={20} />
+          </button>
 
-            <Box
-              sx={{
-                p: { xs: 1, sm: 2 },
-                bgcolor: "white",
-                borderTop: "1px solid #e0e0e0",
-                pb: isMobile ? "env(safe-area-inset-bottom)" : 2,
+          <div
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 10,
+              display: "grid",
+              placeItems: "center",
+              background: stringToGradient(room || "General"),
+              flexShrink: 0,
+              color: "#fff",
+            }}
+          >
+            <Hash size={18} />
+          </div>
+
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p
+              style={{
+                fontWeight: 700,
+                fontSize: "1.05rem",
+                letterSpacing: "-0.01em",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
               }}
             >
-              <MessageInput
-                text={inputText}
-                setText={setInputText}
-                onSendMessage={handleSendMessageWrapper}
-                editingMessage={editingMessage}
-                onEditMessage={handleFinishEdit}
-                onCancelEdit={handleCancelEdit}
-              />
-            </Box>
-          </Paper>
-        </Container>
-      </Box>
-    </Box>
+              {room}
+            </p>
+            <p style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+              {t("chat.currentUser")}: {currentUser}
+            </p>
+          </div>
+        </div>
+
+        {/* Messages */}
+        <div
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            padding: "1rem 1.25rem",
+          }}
+        >
+          {isLoading ? (
+            <Loader fullScreen={false} message={t("chat.loading")} />
+          ) : error ? (
+            <div className="alert-error" style={{ margin: "1rem 0" }}>
+              {error}
+            </div>
+          ) : (
+            <MessageList
+              messages={messages}
+              currentUser={currentUser}
+              onDeleteMessage={deleteMessage}
+              onEditMessage={handleStartEdit}
+            />
+          )}
+        </div>
+
+        {/* Input */}
+        <div
+          style={{
+            padding: "0.9rem 1.25rem",
+            borderTop: "1px solid var(--border)",
+            background: "var(--bg-sidebar)",
+            backdropFilter: "blur(16px)",
+          }}
+        >
+          <MessageInput
+            text={inputText}
+            setText={setInputText}
+            onSendMessage={handleSend}
+            editingMessage={editingMessage}
+            onEditMessage={handleFinishEdit}
+            onCancelEdit={handleCancelEdit}
+          />
+        </div>
+      </div>
+    </div>
   );
 };
 

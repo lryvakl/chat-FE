@@ -1,18 +1,11 @@
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
-import SendIcon from "@mui/icons-material/Send";
-import {
-  TextField,
-  Box,
-  IconButton,
-  useTheme,
-  alpha,
-  FormHelperText,
-} from "@mui/material";
-import { useMemo } from "react";
+import clsx from "clsx";
+import { Check, Send, X } from "lucide-react";
+import { useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { MessageInputProps } from "../types/interfaces";
+
+const MAX_LENGTH = 800;
 
 export const MessageInput = ({
   onSendMessage,
@@ -22,119 +15,121 @@ export const MessageInput = ({
   text,
   setText,
 }: MessageInputProps) => {
-  const theme = useTheme();
   const { t } = useTranslation();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const MAX_LENGTH = 800;
-
-  const isLimitReached = useMemo(() => text.length >= MAX_LENGTH, [text]);
+  const isLimitReached = text.length >= MAX_LENGTH;
+  const canSend = useMemo(() => text.trim().length > 0, [text]);
 
   const handleSend = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!text.trim()) return;
-
-    if (editingMessage) {
-      onEditMessage();
-    } else {
-      onSendMessage(text);
-    }
+    if (!canSend) return;
+    editingMessage ? onEditMessage() : onSendMessage(text);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
   };
 
-  const getHelperText = useMemo(() => {
-    if (isLimitReached) {
-      return `Character limit reached (${text.length}/${MAX_LENGTH})`;
-    } else {
-      return `${text.length}/${MAX_LENGTH}`;
-    }
-  }, [text, isLimitReached]);
+  /* Auto-resize textarea */
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 140)}px`;
+  }, [text]);
 
   return (
-    <Box component="form" onSubmit={handleSend}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "flex-end",
-          gap: 1,
-        }}
-      >
-        <TextField
+    <form onSubmit={handleSend}>
+      {editingMessage && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            marginBottom: "0.5rem",
+            padding: "0.35rem 0.75rem",
+            background: "rgba(99,102,241,0.08)",
+            border: "1px solid rgba(99,102,241,0.2)",
+            borderRadius: "0.75rem",
+          }}
+        >
+          <span
+            style={{
+              fontSize: "0.78rem",
+              fontWeight: 700,
+              color: "#6366f1",
+            }}
+          >
+            {t("chat.editMessage") || "Editing"}
+          </span>
+          <span
+            style={{
+              flex: 1,
+              fontSize: "0.8rem",
+              color: "var(--text-muted)",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {editingMessage.text}
+          </span>
+          <button
+            type="button"
+            className="icon-btn danger"
+            onClick={onCancelEdit}
+            aria-label="Cancel edit"
+            style={{ padding: "0.2rem" }}
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
+      <div className="msg-input-wrap">
+        <textarea
           id="message-input"
-          fullWidth
-          variant="outlined"
+          ref={textareaRef}
+          className={clsx("msg-input-field", isLimitReached && "error")}
           placeholder={
             editingMessage ? t("chat.editMessage") : t("chat.typeMessage")
           }
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
-          multiline
-          maxRows={4}
-          size="small"
+          maxLength={MAX_LENGTH}
           autoComplete="off"
-          error={isLimitReached}
-          inputProps={{ maxLength: MAX_LENGTH }}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "20px",
-              backgroundColor: isLimitReached
-                ? alpha(theme.palette.error.main, 0.1)
-                : theme.palette.action.hover,
-            },
-          }}
+          rows={1}
         />
 
-        {editingMessage && (
-          <IconButton
-            onClick={onCancelEdit}
-            color="error"
-            size="small"
-            sx={{ mb: 0.5 }}
-          >
-            <CloseIcon />
-          </IconButton>
-        )}
-
-        <IconButton
+        <button
           id="message-send"
-          aria-label="send-message"
           type="submit"
-          disabled={!text.trim()}
-          sx={{
-            bgcolor: text.trim() ? "primary.main" : "action.disabledBackground",
-            color: "white",
-            "&:hover": {
-              bgcolor: "primary.dark",
-            },
-            width: 40,
-            height: 40,
-            mb: 0.1,
-            transition: "background-color 0.2s",
-          }}
+          className="send-btn"
+          disabled={!canSend}
+          aria-label="Send message"
         >
-          {editingMessage ? <CheckIcon /> : <SendIcon />}
-        </IconButton>
-      </Box>
+          {editingMessage ? <Check size={18} /> : <Send size={18} />}
+        </button>
+      </div>
 
-      <Box sx={{ display: "flex", justifyContent: "flex-end", px: 1 }}>
-        <FormHelperText
-          error={isLimitReached}
-          sx={{
+      {text.length > 0 && (
+        <p
+          style={{
             textAlign: "right",
-            mt: 0.5,
-            visibility: text.length > 0 ? "visible" : "hidden",
+            fontSize: "0.7rem",
+            marginTop: "0.3rem",
+            color: isLimitReached ? "#ef4444" : "var(--text-muted)",
           }}
         >
-          {getHelperText}
-        </FormHelperText>
-      </Box>
-    </Box>
+          {text.length}/{MAX_LENGTH}
+        </p>
+      )}
+    </form>
   );
 };
 

@@ -1,28 +1,20 @@
-import LogoutIcon from "@mui/icons-material/Logout";
-import {
-  Toolbar,
-  Box,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Divider,
-  Button,
-  Typography,
-} from "@mui/material";
+import { Hash, LogOut } from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
+import { getChatSteps } from "../constants/steps";
+import { stringToColor, stringToGradient } from "../theme";
 import { PATHS } from "../types/enums";
 import type { ChatSidebarProps } from "../types/interfaces";
 import { LanguageSwitcher } from "./utils/LanguageSwitcher";
+import { ThemeToggle } from "./utils/ThemeToggle";
 import { TourButton } from "./utils/TourButton";
-import { getChatSteps } from "../constants/steps";
 
 export const ChatSidebar = ({
   rooms,
   currentRoom,
+  currentUser,
   onLogout,
   onRoomSelect,
 }: ChatSidebarProps) => {
@@ -32,71 +24,155 @@ export const ChatSidebar = ({
 
   const handleRoomClick = (roomName: string) => {
     navigate(`${PATHS.CHAT}/${roomName}`);
-    if (onRoomSelect) {
-      onRoomSelect();
-    }
+    onRoomSelect?.();
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        width: 280,
-        borderRight: "1px solid #e0e0e0",
-        bgcolor: "background.paper",
-      }}
-    >
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between", px: 2 }}>
-        <Typography
-          variant="h6"
-          noWrap
-          component="div"
-          sx={{ color: "primary.main", fontWeight: "bold" }}
-        >
-          {t("header.title")}
-        </Typography>
-        <TourButton steps={chatSteps} />
-        <LanguageSwitcher />
-      </Toolbar>
-
-      <Divider />
-
-      <Box
-        sx={{
-          overflow: "auto",
-          flexGrow: 1,
+    <div className="sidebar">
+      {/* Header */}
+      <div
+        style={{
           display: "flex",
-          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "1.1rem 1.25rem",
+          borderBottom: "1px solid var(--border)",
         }}
       >
-        <List id="room-list">
-          {rooms.map((text) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton
-                selected={currentRoom === text}
-                onClick={() => handleRoomClick(text)}
-              >
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-
-        <Box sx={{ mt: "auto" }}>
-          <Divider />
-          <Button
-            fullWidth
-            onClick={onLogout}
-            color="error"
-            startIcon={<LogoutIcon />}
-            sx={{ p: 2, borderRadius: 0 }}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+          <div
+            className="logo-mark"
+            style={{ width: 36, height: 36, borderRadius: "0.6rem", flexShrink: 0 }}
           >
-            {t("header.logout")}
-          </Button>
-        </Box>
-      </Box>
-    </Box>
+            <span style={{ fontWeight: 800, fontSize: 16 }}>C</span>
+          </div>
+          <span
+            className="gradient-text"
+            style={{ fontWeight: 800, fontSize: "1.05rem", letterSpacing: "-0.02em" }}
+          >
+            {t("header.title")}
+          </span>
+        </div>
+        <div style={{ display: "flex", gap: "0.1rem" }}>
+          <ThemeToggle />
+          <TourButton steps={chatSteps} />
+          <LanguageSwitcher />
+        </div>
+      </div>
+
+      {/* Room label */}
+      <div style={{ padding: "0.9rem 1.25rem 0.3rem" }}>
+        <span
+          style={{
+            fontSize: "0.68rem",
+            fontWeight: 700,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: "var(--text-muted)",
+          }}
+        >
+          {t("chat.room") || "Rooms"}
+        </span>
+      </div>
+
+      {/* Room list */}
+      <nav id="room-list" style={{ flex: 1, overflowY: "auto" }}>
+        {rooms.map((name) => {
+          const active = currentRoom === name;
+          return (
+            <button
+              key={name}
+              className={`room-btn${active ? " active" : ""}`}
+              onClick={() => handleRoomClick(name)}
+            >
+              <span
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 8,
+                  flexShrink: 0,
+                  display: "grid",
+                  placeItems: "center",
+                  background: stringToGradient(name),
+                  boxShadow: active ? `0 4px 14px ${stringToColor(name)}55` : "none",
+                  transition: "box-shadow 0.25s",
+                  color: "#fff",
+                }}
+              >
+                <Hash size={15} />
+              </span>
+              {name}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* User profile footer */}
+      <div
+        style={{
+          padding: "0.9rem 1.1rem",
+          borderTop: "1px solid var(--border)",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.85rem",
+        }}
+      >
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              display: "grid",
+              placeItems: "center",
+              background: stringToGradient(currentUser),
+              boxShadow: `0 4px 14px ${stringToColor(currentUser)}55`,
+              color: "#fff",
+              fontWeight: 700,
+              fontSize: "1rem",
+            }}
+          >
+            {currentUser.charAt(0).toUpperCase()}
+          </div>
+          <span
+            style={{
+              position: "absolute",
+              bottom: -1,
+              right: -1,
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              background: "#22c55e",
+              border: "2px solid var(--bg-sidebar)",
+              animation: "pulse-dot 2.4s ease-in-out infinite",
+            }}
+          />
+        </div>
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p
+            style={{
+              fontWeight: 600,
+              fontSize: "0.875rem",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {currentUser}
+          </p>
+          <p style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>online</p>
+        </div>
+
+        <button
+          className="icon-btn danger"
+          onClick={onLogout}
+          aria-label={t("header.logout")}
+          title={t("header.logout")}
+        >
+          <LogOut size={17} />
+        </button>
+      </div>
+    </div>
   );
 };

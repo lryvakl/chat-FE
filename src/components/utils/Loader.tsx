@@ -1,32 +1,24 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
-
 import type { LoaderProps } from "../../types/interfaces";
 
-export const Loader = ({ fullScreen = false, message }: LoaderProps) => {
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: fullScreen ? "100vh" : "100%",
-        width: "100%",
-        bgcolor: fullScreen ? "background.default" : "transparent",
-      }}
-    >
-      <CircularProgress />
-      {message && (
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ mt: 2, fontWeight: 500 }}
-        >
-          {message}
-        </Typography>
-      )}
-    </Box>
-  );
-};
+export const Loader = ({ fullScreen = false, message }: LoaderProps) => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "100%",
+      minHeight: fullScreen ? "100vh" : "100%",
+      gap: "1rem",
+    }}
+  >
+    <div className="spinner" />
+    {message && (
+      <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", fontWeight: 500 }}>
+        {message}
+      </p>
+    )}
+  </div>
+);
 
 export default Loader;

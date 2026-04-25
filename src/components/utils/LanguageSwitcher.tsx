@@ -1,97 +1,50 @@
-import CheckIcon from "@mui/icons-material/Check";
-import LanguageIcon from "@mui/icons-material/Language";
-import {
-  IconButton,
-  Menu,
-  MenuItem,
-  Tooltip,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
-import { useState } from "react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { Check, Globe } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
+const LANGUAGES = [
+  { code: "uk", flag: "🇺🇦", label: "UA" },
+  { code: "en", flag: "🇬🇧", label: "EN" },
+  { code: "pl", flag: "🇵🇱", label: "PL" },
+  { code: "ja", flag: "🇯🇵", label: "JP" },
+] as const;
 
 export const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    handleClose();
-  };
-
   return (
-    <>
-      <Tooltip title="Change Language">
-        <IconButton
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button
           id="language-switcher"
-          onClick={handleClick}
-          size="small"
-          aria-controls={open ? "language-menu" : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? "true" : undefined}
-          sx={{ color: "primary.main" }}
+          className="icon-btn"
+          aria-label="Change language"
         >
-          <LanguageIcon />
-        </IconButton>
-      </Tooltip>
+          <Globe size={18} />
+        </button>
+      </DropdownMenu.Trigger>
 
-      <Menu
-        anchorEl={anchorEl}
-        id="language-menu"
-        open={open}
-        onClose={handleClose}
-        onClick={handleClose}
-        slotProps={{
-          paper: {
-            elevation: 0,
-            sx: {
-              overflow: "visible",
-              filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-              mt: 1.5,
-              "& .MuiAvatar-root": {
-                width: 32,
-                height: 32,
-                ml: -0.5,
-                mr: 1,
-              },
-            },
-          },
-        }}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-      >
-        <MenuItem onClick={() => changeLanguage("uk")}>
-          <ListItemIcon>
-            {i18n.language === "uk" && <CheckIcon fontSize="small" />}
-          </ListItemIcon>
-          <ListItemText> 🇺🇦 UA</ListItemText>
-        </MenuItem>
-
-        <MenuItem onClick={() => changeLanguage("pl")}>
-          <ListItemIcon>
-            {i18n.language === "pl" && <CheckIcon fontSize="small" />}
-          </ListItemIcon>
-          <ListItemText>🇵🇱 PL</ListItemText>
-        </MenuItem>
-
-        <MenuItem onClick={() => changeLanguage("ja")}>
-          <ListItemIcon>
-            {i18n.language === "ja" && <CheckIcon fontSize="small" />}
-          </ListItemIcon>
-          <ListItemText>🇯🇵 JP</ListItemText>
-        </MenuItem>
-      </Menu>
-    </>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          className="dropdown-content"
+          align="end"
+          sideOffset={6}
+        >
+          {LANGUAGES.map(({ code, flag, label }) => (
+            <DropdownMenu.Item
+              key={code}
+              className="dropdown-item"
+              onSelect={() => i18n.changeLanguage(code)}
+            >
+              <span>{flag}</span>
+              <span style={{ flex: 1 }}>{label}</span>
+              {i18n.language === code && (
+                <Check size={14} style={{ color: "#6366f1" }} />
+              )}
+            </DropdownMenu.Item>
+          ))}
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   );
 };
