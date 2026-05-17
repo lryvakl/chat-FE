@@ -12,7 +12,7 @@ import { TourButton } from "../components/utils/TourButton";
 import { getRegisterSteps } from "../constants/steps";
 import type { AppDispatch, RootState } from "../store";
 import { registerUser } from "../store/thunks/register";
-import { PATHS, Room } from "../types/enums";
+import { PATHS } from "../types/enums";
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
@@ -27,7 +27,7 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (token) navigate(`${PATHS.CHAT}/${Room.General}`);
+    if (token) navigate(PATHS.CHAT);
   }, [token, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {

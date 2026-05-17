@@ -1,4 +1,4 @@
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import {
   persistStore,
   persistReducer,
@@ -8,27 +8,30 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
-} from "redux-persist";
-import storage from "redux-persist/lib/storage";
+} from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 
-import authReducer from "./authSlice";
-import chatReducer from "./chatSlice";
+import authReducer from './authSlice';
+import conversationsReducer from './conversationsSlice';
+import messagesReducer from './messagesSlice';
+import presenceReducer from './presenceSlice';
 
 const persistConfig = {
-  key: "root",
+  key: 'root',
   storage,
-  whitelist: ["chat", "auth"],
+  whitelist: [] as string[],
 };
 
 const rootReducer = combineReducers({
-  chat: chatReducer,
   auth: authReducer,
+  conversations: conversationsReducer,
+  messages: messagesReducer,
+  presence: presenceReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -36,7 +39,6 @@ export const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-
 });
 
 export const persistor = persistStore(store);
