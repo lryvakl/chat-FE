@@ -1,26 +1,21 @@
-import { useSelector } from "react-redux";
-import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { useSelector } from 'react-redux';
+import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 
-import ChatPage from "./pages/ChatPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import type { RootState } from "./store";
-import "./App.css";
-import { PATHS } from "./types/enums";
-import { Room } from "./types/enums";
+import ChatPage from './pages/ChatPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import type { RootState } from './store';
+import './App.css';
+import { PATHS } from './types/enums';
 
 const ProtectedRoute = () => {
-  const isAuthenticated = useSelector((state: RootState) => state.auth.token);
-  return isAuthenticated ? <Outlet /> : <Navigate to={PATHS.LOGIN} replace />;
+  const token = useSelector((s: RootState) => s.auth.token);
+  return token ? <Outlet /> : <Navigate to={PATHS.LOGIN} replace />;
 };
 
 const GuestRoute = () => {
-  const isAuthenticated = useSelector((state: RootState) => state.auth.token);
-  return isAuthenticated ? (
-    <Navigate to={`${PATHS.CHAT}/${Room.General}`} replace />
-  ) : (
-    <Outlet />
-  );
+  const token = useSelector((s: RootState) => s.auth.token);
+  return token ? <Navigate to={PATHS.CHAT} replace /> : <Outlet />;
 };
 
 function App() {
@@ -31,16 +26,11 @@ function App() {
         <Route path={PATHS.REGISTER} element={<RegisterPage />} />
       </Route>
       <Route element={<ProtectedRoute />}>
-        <Route path={`${PATHS.CHAT}/:room`} element={<ChatPage />} />
-        <Route
-          path={PATHS.CHAT}
-          element={<Navigate to={`${PATHS.CHAT}/${Room.General}`} replace />}
-        />
+        <Route path={PATHS.CHAT} element={<ChatPage />} />
+        <Route path={`${PATHS.CHAT}/:id`} element={<ChatPage />} />
       </Route>
-      <Route
-        path="/"
-        element={<Navigate to={`${PATHS.CHAT}/${Room.General}`} replace />}
-      />
+      <Route path="/" element={<Navigate to={PATHS.CHAT} replace />} />
+      <Route path="*" element={<Navigate to={PATHS.CHAT} replace />} />
     </Routes>
   );
 }
