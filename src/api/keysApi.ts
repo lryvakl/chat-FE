@@ -30,6 +30,20 @@ export interface KeyCounts {
   hasIdentity: boolean;
   signedPreKeyId: number | null;
   oneTimePreKeyCount: number;
+  hasVaultBackup: boolean;
+}
+
+export interface VaultBackupPayload {
+  version: number;
+  kdfSalt: string;
+  kdfOps: number;
+  kdfMem: number;
+  nonce: string;
+  ciphertext: string;
+}
+
+export interface VaultBackupResponse extends VaultBackupPayload {
+  updatedAt: string;
 }
 
 const authHeader = (token?: string) =>
@@ -75,5 +89,37 @@ export const keysApi = {
       { headers: authHeader(token) },
     );
     return data;
+  },
+  async uploadVaultBackup(payload: VaultBackupPayload, token?: string) {
+    const { data } = await http.post<{ ok: boolean }>(
+      'keys/vault-backup',
+      payload,
+      { headers: authHeader(token) },
+    );
+    return data;
+  },
+  async downloadVaultBackup(
+    token?: string,
+  ): Promise<VaultBackupResponse | null> {
+    try {
+      const { data } = await http.get<VaultBackupResponse>(
+        'keys/vault-backup',
+        {
+          headers: authHeader(token),
+        },
+      );
+      return data;
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response
+        ?.status;
+      if (status === 404) return null;
+      throw err;
+    }
+  },
+  async deleteVaultBackup(token?: string) {
+    const { data } = await http.delete('keys/vault-backup', {
+      headers: authHeader(token),
+    });
+    return data as { ok: boolean };
   },
 };

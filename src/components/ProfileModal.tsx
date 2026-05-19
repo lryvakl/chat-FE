@@ -37,7 +37,7 @@ export const ProfileModal = ({ onClose }: ProfileModalProps) => {
   const me = useSelector((s: RootState) => s.auth.user);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [displayName, setDisplayName] = useState(me?.displayName ?? '');
+  const [username, setUsername] = useState(me?.username ?? '');
   const [bio, setBio] = useState(me?.bio ?? '');
   const [customStatus, setCustomStatus] = useState(me?.customStatus ?? '');
   const [accentColor, setAccentColor] = useState(me?.accentColor ?? '#7c5cff');
@@ -54,7 +54,7 @@ export const ProfileModal = ({ onClose }: ProfileModalProps) => {
       try {
         const fresh = await usersApi.me();
         if (cancelled) return;
-        setDisplayName(fresh.displayName ?? '');
+        setUsername(fresh.username ?? '');
         setBio(fresh.bio ?? '');
         setCustomStatus(fresh.customStatus ?? '');
         setAccentColor(fresh.accentColor ?? '#7c5cff');
@@ -92,10 +92,19 @@ export const ProfileModal = ({ onClose }: ProfileModalProps) => {
   };
 
   const handleSave = async () => {
+    const trimmedUsername = username.trim();
+    if (trimmedUsername.length < 2) {
+      alert('Username must be at least 2 characters.');
+      return;
+    }
+    if (trimmedUsername.length > 30) {
+      alert('Username is too long (max 30 characters).');
+      return;
+    }
     setSaving(true);
     try {
       const payload: UpdateProfilePayload = {
-        displayName: displayName.trim() || null,
+        username: trimmedUsername,
         bio: bio.trim() || null,
         customStatus: customStatus.trim() || null,
         accentColor: accentColor || null,
@@ -105,15 +114,18 @@ export const ProfileModal = ({ onClose }: ProfileModalProps) => {
       const updated = await usersApi.updateMe(payload);
       dispatch(profileUpdated(updated));
       onClose();
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Profile save failed:', err);
-      alert('Failed to save profile.');
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? 'Failed to save profile.';
+      alert(message);
     } finally {
       setSaving(false);
     }
   };
 
-  const avatarSeed = displayName || me?.username || '?';
+  const avatarSeed = username || me?.username || '?';
 
   return createPortal(
     <div className="modal-overlay" onClick={onClose}>
@@ -158,17 +170,17 @@ export const ProfileModal = ({ onClose }: ProfileModalProps) => {
                 if (f) void handleAvatar(f);
               }}
             />
-            <p className="profile-username">@{me?.username}</p>
+            <p className="profile-username">@{username || me?.username}</p>
             {uploading && <p className="profile-hint">Reading file…</p>}
           </div>
 
-          <div className="settings-section-title">Display name</div>
+          <div className="settings-section-title">Username</div>
           <input
             className="modal-input"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            maxLength={80}
-            placeholder="How you appear to others"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            maxLength={30}
+            placeholder="Your username"
           />
 
           <div className="settings-section-title">Bio</div>

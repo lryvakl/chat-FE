@@ -202,6 +202,7 @@ export const ConversationList = ({
                 isGroup={conv.type === ConversationType.Group}
                 showPresence={conv.type === ConversationType.Dm}
                 isOnline={peerOnline}
+                accentColor={display.peerAccentColor}
                 size={46}
               />
               <div className="conv-list-body">

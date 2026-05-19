@@ -7,6 +7,7 @@ export interface ConversationDisplay {
   avatarSeed: string;
   avatarUrl: string | null;
   peerUserId: number | null;
+  peerAccentColor: string | null;
 }
 
 export const describeConversation = (
@@ -21,6 +22,7 @@ export const describeConversation = (
       avatarSeed: peer?.username ?? String(conv.id),
       avatarUrl: peer?.avatarUrl ?? null,
       peerUserId: peer?.userId ?? null,
+      peerAccentColor: peer?.accentColor ?? null,
     };
   }
   return {
@@ -29,6 +31,7 @@ export const describeConversation = (
     avatarSeed: conv.name ?? String(conv.id),
     avatarUrl: conv.avatarUrl ?? null,
     peerUserId: null,
+    peerAccentColor: null,
   };
 };
 

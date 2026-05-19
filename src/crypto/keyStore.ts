@@ -45,6 +45,22 @@ let cached: VaultPlaintext | null = null;
 let cachedUserId: number | null = null;
 let cachedKek: Uint8Array | null = null;
 
+type BackupListener = (stored: StoredVault) => void;
+let backupListener: BackupListener | null = null;
+
+export const setBackupListener = (fn: BackupListener | null): void => {
+  backupListener = fn;
+};
+
+const notifyBackup = (stored: StoredVault): void => {
+  if (!backupListener) return;
+  try {
+    backupListener(stored);
+  } catch (err) {
+    console.warn('Vault backup listener threw:', err);
+  }
+};
+
 const db = async (): Promise<IDBPDatabase> =>
   openDB(DB_NAME, 1, {
     upgrade(database) {
@@ -164,6 +180,7 @@ export const createVault = async (
   cached = plaintext;
   cachedUserId = userId;
   cachedKek = kek;
+  notifyBackup(stored);
 };
 
 export const unlockVault = async (
@@ -216,6 +233,54 @@ export const persistVault = async (): Promise<void> => {
     nonce: await toB64(nonce),
   };
   await database.put(STORE, stored, VAULT_KEY);
+  notifyBackup(stored);
+};
+
+export interface EncryptedVaultBlob {
+  version: 1;
+  kdfSalt: string;
+  kdfOps: number;
+  kdfMem: number;
+  nonce: string;
+  ciphertext: string;
+}
+
+export const exportEncryptedVault = async (
+  userId: number,
+): Promise<EncryptedVaultBlob | null> => {
+  const database = await db();
+  const raw = (await database.get(STORE, VAULT_KEY)) as StoredVault | undefined;
+  if (!raw || raw.userId !== userId) return null;
+  return {
+    version: 1,
+    kdfSalt: raw.kdfSalt,
+    kdfOps: raw.kdfOps,
+    kdfMem: raw.kdfMem,
+    nonce: raw.nonce,
+    ciphertext: raw.ciphertext,
+  };
+};
+
+export const importEncryptedVault = async (
+  userId: number,
+  username: string,
+  blob: EncryptedVaultBlob,
+): Promise<void> => {
+  const stored: StoredVault = {
+    version: 1,
+    userId,
+    username,
+    kdfSalt: blob.kdfSalt,
+    kdfOps: blob.kdfOps,
+    kdfMem: blob.kdfMem,
+    ciphertext: blob.ciphertext,
+    nonce: blob.nonce,
+  };
+  const database = await db();
+  await database.put(STORE, stored, VAULT_KEY);
+  cached = null;
+  cachedUserId = null;
+  cachedKek = null;
 };
 
 export const lockVault = (): void => {

@@ -1,7 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { authApi } from '../../api/authApi';
-import { ensureIdentityProvisioned } from '../../crypto/provisioning';
+import {
+  ensureIdentityProvisioned,
+  MissingIdentityError,
+  VaultRestoreFailedError,
+} from '../../crypto/provisioning';
 import type { AuthCredentials } from '../../types/interfaces';
 
 export const loginUser = createAsyncThunk(
@@ -19,6 +23,13 @@ export const loginUser = createAsyncThunk(
         );
       } catch (cryptoErr) {
         console.error('Crypto provisioning failed:', cryptoErr);
+        if (
+          cryptoErr instanceof MissingIdentityError ||
+          cryptoErr instanceof VaultRestoreFailedError
+        ) {
+          localStorage.removeItem('token');
+          return rejectWithValue(cryptoErr.message);
+        }
       }
       return response;
     } catch (error: unknown) {

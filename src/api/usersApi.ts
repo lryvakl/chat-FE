@@ -2,6 +2,7 @@ import http from './axios.instance';
 import type { User, UserProfile } from '../types/interfaces';
 
 export interface UpdateProfilePayload {
+  username?: string;
   displayName?: string | null;
   avatarUrl?: string | null;
   bio?: string | null;

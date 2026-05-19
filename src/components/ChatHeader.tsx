@@ -103,6 +103,7 @@ export const ChatHeader = ({
             isGroup={conversation.type === ConversationType.Group}
             showPresence={conversation.type === ConversationType.Dm}
             isOnline={peerOnline}
+            accentColor={peer?.accentColor ?? null}
             size={40}
           />
         )}

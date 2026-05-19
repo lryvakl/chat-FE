@@ -10,7 +10,11 @@ interface AvatarProps {
   showPresence?: boolean;
   isOnline?: boolean;
   avatarUrl?: string | null;
+  accentColor?: string | null;
 }
+
+const accentGradient = (hex: string) =>
+  `linear-gradient(135deg, ${hex} 0%, ${hex}b3 100%)`;
 
 export const Avatar = ({
   seed,
@@ -19,8 +23,11 @@ export const Avatar = ({
   showPresence = false,
   isOnline = false,
   avatarUrl = null,
+  accentColor = null,
 }: AvatarProps) => {
   const dotSize = Math.max(10, Math.round(size * 0.28));
+  const tint = accentColor || stringToColor(seed);
+  const bg = accentColor ? accentGradient(accentColor) : stringToGradient(seed);
   return (
     <div
       style={{
@@ -40,7 +47,7 @@ export const Avatar = ({
             borderRadius: '50%',
             objectFit: 'cover',
             display: 'block',
-            boxShadow: `0 4px 14px ${stringToColor(seed)}44`,
+            boxShadow: `0 4px 14px ${tint}44`,
           }}
         />
       ) : (
@@ -51,8 +58,8 @@ export const Avatar = ({
             borderRadius: '50%',
             display: 'grid',
             placeItems: 'center',
-            background: stringToGradient(seed),
-            boxShadow: `0 4px 14px ${stringToColor(seed)}44`,
+            background: bg,
+            boxShadow: `0 4px 14px ${tint}44`,
             color: '#fff',
             fontWeight: 700,
             fontSize: Math.round(size * 0.42),

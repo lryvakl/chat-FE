@@ -42,6 +42,7 @@ export interface ConversationMemberSummary {
   displayName?: string | null;
   avatarUrl?: string | null;
   customStatus?: string | null;
+  accentColor?: string | null;
 }
 
 export interface LastMessagePreview {

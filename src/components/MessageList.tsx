@@ -55,6 +55,11 @@ export const MessageList = ({
     for (const m of members) map.set(m.userId, m.avatarUrl ?? null);
     return map;
   }, [members]);
+  const accentByUserId = useMemo(() => {
+    const map = new Map<number, string | null>();
+    for (const m of members) map.set(m.userId, m.accentColor ?? null);
+    return map;
+  }, [members]);
   const endRef = useRef<HTMLDivElement>(null);
   const { t, i18n } = useTranslation();
   const [pickerForId, setPickerForId] = useState<number | null>(null);
@@ -118,6 +123,11 @@ export const MessageList = ({
         const isMe = msg.senderId === currentUserId;
         const prev = items[index - 1];
         const senderName = msg.senderUsername ?? 'Unknown';
+        const senderAccent =
+          msg.senderId !== null
+            ? (accentByUserId.get(msg.senderId) ?? null)
+            : null;
+        const senderColor = senderAccent ?? stringToColor(senderName);
 
         const showDate = !prev || !isSameDay(msg.createdAt, prev.createdAt);
         const showAvatar =
@@ -149,7 +159,7 @@ export const MessageList = ({
                   fontSize: '0.73rem',
                   fontWeight: 700,
                   marginBottom: '0.25rem',
-                  color: stringToColor(senderName),
+                  color: senderColor,
                 }}
               >
                 {senderName}
@@ -258,6 +268,7 @@ export const MessageList = ({
                           ? (avatarByUserId.get(msg.senderId) ?? null)
                           : null
                       }
+                      accentColor={senderAccent}
                       size={36}
                     />
                   )}
