@@ -66,6 +66,9 @@ export const ConversationList = ({
   const readByConversation = useSelector(
     (s: RootState) => s.presence.readByConversation,
   );
+  const typingByConversation = useSelector(
+    (s: RootState) => s.presence.typingByConversation,
+  );
   const isLoading = useSelector((s: RootState) => s.conversations.isLoading);
 
   const [profileOpen, setProfileOpen] = useState(false);
@@ -284,6 +287,24 @@ export const ConversationList = ({
             totalRecipients > 0;
           const someRead = isMyLastMessage && readersCount > 0 && !allRead;
 
+          const typingMap = typingByConversation[conv.id];
+          const now = Date.now();
+          const typingUsernames = typingMap
+            ? Object.entries(typingMap)
+                .filter(
+                  ([uid, info]) =>
+                    Number(uid) !== (currentUser?.id ?? -1) &&
+                    info.expiresAt > now,
+                )
+                .map(([, info]) => info.username || t('common.someone'))
+            : [];
+          const typingLabel =
+            typingUsernames.length === 1
+              ? t('chat.isTyping', { name: typingUsernames[0] })
+              : typingUsernames.length >= 2
+                ? t('chat.peopleTyping', { count: typingUsernames.length })
+                : null;
+
           return (
             <button
               key={conv.id}
@@ -318,9 +339,18 @@ export const ConversationList = ({
                   </span>
                 </div>
                 <div className="conv-list-row">
-                  <span className="conv-list-preview">
-                    {conv.lastMessage?.text ?? t('chat.noMessagesYet')}
-                  </span>
+                  {typingLabel ? (
+                    <span className="conv-list-preview is-typing">
+                      <span className="typing-dot" />
+                      <span className="typing-dot" />
+                      <span className="typing-dot" />
+                      {typingLabel}
+                    </span>
+                  ) : (
+                    <span className="conv-list-preview">
+                      {conv.lastMessage?.text ?? t('chat.noMessagesYet')}
+                    </span>
+                  )}
                   <span
                     style={{
                       display: 'inline-flex',

@@ -181,6 +181,20 @@
   min-width: 0;
 }
 
+.conv-list-preview.is-typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent);
+  font-style: italic;
+}
+
+.conv-list-preview.is-typing .typing-dot {
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+}
+
 .conv-list-unread-dot {
   width: 9px;
   height: 9px;
