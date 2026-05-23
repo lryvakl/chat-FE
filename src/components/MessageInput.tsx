@@ -8,6 +8,7 @@ import { mediaApi } from '../api/mediaApi';
 import { encryptBlob } from '../crypto/mediaCrypto';
 import type { MediaAttachment } from '../crypto/messageEnvelope';
 import { useVoiceRecorder } from '../hooks/useVoiceRecorder';
+import { usePreferences } from '../preferences/PreferencesContext';
 import type { Message } from '../types/interfaces';
 
 const MAX_LENGTH = 4000;
@@ -61,6 +62,7 @@ export const MessageInput = ({
   onStopTyping,
 }: MessageInputProps) => {
   const { t } = useTranslation();
+  const { prefs } = usePreferences();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [attachment, setAttachment] = useState<PendingAttachment | null>(null);
@@ -105,7 +107,7 @@ export const MessageInput = ({
     e.target.value = '';
     if (!file) return;
     if (file.size > MAX_FILE_BYTES) {
-      alert(`File too large (max ${MAX_FILE_BYTES / 1024 / 1024} MB).`);
+      alert(t('errors.fileTooLarge', { mb: MAX_FILE_BYTES / 1024 / 1024 }));
       return;
     }
     const isImage = file.type.startsWith('image/');
@@ -152,7 +154,7 @@ export const MessageInput = ({
         };
       } catch (err) {
         console.error('Upload failed:', err);
-        alert('Upload failed — try again.');
+        alert(t('errors.uploadFailed'));
         setUploading(false);
         return;
       }
@@ -191,14 +193,21 @@ export const MessageInput = ({
       onSend('', mediaMeta);
     } catch (err) {
       console.error('Voice upload failed:', err);
-      alert('Voice upload failed — try again.');
+      alert(t('errors.voiceUploadFailed'));
     } finally {
       setUploading(false);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (prefs.sendOnEnter && e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      void handleSubmit();
+    } else if (
+      !prefs.sendOnEnter &&
+      e.key === 'Enter' &&
+      (e.metaKey || e.ctrlKey)
+    ) {
       e.preventDefault();
       void handleSubmit();
     }
@@ -220,14 +229,14 @@ export const MessageInput = ({
       {editingMessage && (
         <div className="msg-edit-banner">
           <span className="msg-edit-label">
-            {t('chat.editMessage') || 'Editing'}
+            {t('chat.editing')}
           </span>
           <span className="msg-edit-preview">{editingMessage.text}</span>
           <button
             type="button"
             className="icon-btn danger"
             onClick={onCancelEdit}
-            aria-label="Cancel edit"
+            aria-label={t('chat.cancelEdit')}
             style={{ padding: '0.2rem' }}
           >
             <X size={14} />
@@ -238,16 +247,18 @@ export const MessageInput = ({
       {!editingMessage && replyingTo && (
         <div className="msg-edit-banner">
           <span className="msg-edit-label">
-            Replying to {replyingTo.senderUsername ?? 'someone'}
+            {t('chat.replyingTo', {
+              name: replyingTo.senderUsername ?? t('common.someone'),
+            })}
           </span>
           <span className="msg-edit-preview">
-            {replyingTo.text || '[media]'}
+            {replyingTo.text || t('chat.mediaPlaceholder')}
           </span>
           <button
             type="button"
             className="icon-btn danger"
             onClick={onCancelReply}
-            aria-label="Cancel reply"
+            aria-label={t('chat.cancelReply')}
             style={{ padding: '0.2rem' }}
           >
             <X size={14} />
@@ -276,7 +287,7 @@ export const MessageInput = ({
             type="button"
             className="icon-btn danger"
             onClick={clearAttachment}
-            aria-label="Remove attachment"
+            aria-label={t('chat.removeAttachment')}
             style={{ padding: '0.2rem' }}
           >
             <X size={14} />
@@ -297,20 +308,20 @@ export const MessageInput = ({
             type="button"
             className="icon-btn danger"
             onClick={cancelRecording}
-            aria-label="Cancel recording"
-            title="Cancel"
+            aria-label={t('chat.cancelRecording')}
+            title={t('common.cancel')}
           >
             <Trash2 size={18} />
           </button>
           <span className="msg-record-dot" />
           <span className="msg-record-label">
-            Recording… {formatDuration(recorder.elapsedSec)}
+            {t('chat.recording')} {formatDuration(recorder.elapsedSec)}
           </span>
           <button
             type="button"
             className="send-btn"
             onClick={() => void stopAndSendRecording()}
-            aria-label="Stop and send"
+            aria-label={t('chat.stopAndSend')}
           >
             {uploading ? (
               <span className="msg-send-spinner" />
@@ -330,9 +341,9 @@ export const MessageInput = ({
             type="button"
             className="icon-btn"
             onClick={handlePickFile}
-            aria-label="Attach file"
+            aria-label={t('chat.attachFile')}
             disabled={Boolean(editingMessage) || uploading}
-            title="Attach a file"
+            title={t('chat.attach')}
           >
             <Paperclip size={18} />
           </button>
@@ -340,9 +351,9 @@ export const MessageInput = ({
             type="button"
             className={clsx('icon-btn', emojiOpen && 'active')}
             onClick={() => setEmojiOpen((v) => !v)}
-            aria-label="Emoji"
+            aria-label={t('chat.emoji')}
             disabled={Boolean(editingMessage) || uploading}
-            title="Emoji"
+            title={t('chat.emoji')}
           >
             <Smile size={18} />
           </button>
@@ -350,9 +361,7 @@ export const MessageInput = ({
             ref={textareaRef}
             className={clsx('msg-input-field', isLimitReached && 'error')}
             placeholder={
-              editingMessage
-                ? t('chat.editMessage') || 'Edit message'
-                : t('chat.typeMessage') || 'Type a message…'
+              editingMessage ? t('chat.editMessage') : t('chat.typeMessage')
             }
             value={text}
             onChange={(e) => {
@@ -371,9 +380,9 @@ export const MessageInput = ({
               type="button"
               className="icon-btn"
               onClick={() => void startRecording()}
-              aria-label="Record voice"
+              aria-label={t('chat.recordVoice')}
               disabled={uploading}
-              title="Record voice message"
+              title={t('chat.recordVoiceMessage')}
             >
               <Mic size={18} />
             </button>
@@ -382,7 +391,7 @@ export const MessageInput = ({
             type="submit"
             className="send-btn"
             disabled={!canSend}
-            aria-label="Send"
+            aria-label={t('chat.send')}
           >
             {uploading ? (
               <span className="msg-send-spinner" />

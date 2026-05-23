@@ -1,8 +1,20 @@
-import { Crown, Search, Shield, UserMinus, UserPlus, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import {
+  Crown,
+  FileIcon,
+  Image as ImageIcon,
+  Link as LinkIcon,
+  Mic,
+  Search,
+  Shield,
+  UserMinus,
+  UserPlus,
+  X,
+} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Avatar } from './Avatar';
+import { MediaBubble } from './MediaBubble';
 import { usersApi } from '../api/usersApi';
 import type { AppDispatch, RootState } from '../store';
 import { addMember, removeMember } from '../store/thunks/conversations';
@@ -11,7 +23,12 @@ import {
   ConversationType,
   PresenceStatus,
 } from '../types/enums';
-import type { Conversation, User } from '../types/interfaces';
+import type {
+  Conversation,
+  Message,
+  User,
+  UserProfile,
+} from '../types/interfaces';
 import {
   describeConversation,
   formatLastSeen,
@@ -22,25 +39,84 @@ interface MembersPanelProps {
   onClose: () => void;
 }
 
+type SharedTab = 'media' | 'voice' | 'files' | 'links';
+
+const URL_REGEX = /\bhttps?:\/\/[^\s<>"']+/gi;
+
 const roleIcon = (role: ConversationRole) => {
   if (role === ConversationRole.Owner) return <Crown size={13} />;
   if (role === ConversationRole.Admin) return <Shield size={13} />;
   return null;
 };
 
+interface ExtractedLink {
+  messageId: number;
+  url: string;
+  createdAt: string;
+}
+
+const extractLinks = (messages: Message[]): ExtractedLink[] => {
+  const out: ExtractedLink[] = [];
+  for (const m of messages) {
+    if (!m.text) continue;
+    const matches = m.text.match(URL_REGEX);
+    if (!matches) continue;
+    for (const url of matches) {
+      out.push({ messageId: m.id, url, createdAt: m.createdAt });
+    }
+  }
+  return out.reverse();
+};
+
+const safeHost = (url: string): string => {
+  try {
+    return new URL(url).host;
+  } catch {
+    return url;
+  }
+};
+
 export const MembersPanel = ({ conversation, onClose }: MembersPanelProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const me = useSelector((s: RootState) => s.auth.user);
   const presence = useSelector((s: RootState) => s.presence.byUserId);
+  const messages = useSelector(
+    (s: RootState) => s.messages.byConversation[conversation.id] ?? [],
+  );
   const isGroup = conversation.type === ConversationType.Group;
   const myRole = conversation.members.find((m) => m.userId === me?.id)?.role;
   const canManage =
     isGroup &&
     (myRole === ConversationRole.Owner || myRole === ConversationRole.Admin);
 
+  const peer = isGroup
+    ? null
+    : (conversation.members.find((m) => m.userId !== me?.id) ?? null);
+
   const [addingOpen, setAddingOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<User[]>([]);
+  const [peerProfile, setPeerProfile] = useState<UserProfile | null>(null);
+  const [activeTab, setActiveTab] = useState<SharedTab>('media');
+
+  useEffect(() => {
+    if (!peer) {
+      setPeerProfile(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const profile = await usersApi.getOne(peer.userId);
+        if (!cancelled) setPeerProfile(profile);
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [peer?.userId]);
 
   useEffect(() => {
     if (!addingOpen) return;
@@ -54,6 +130,34 @@ export const MembersPanel = ({ conversation, onClose }: MembersPanelProps) => {
     }, 200);
     return () => window.clearTimeout(t);
   }, [query, addingOpen]);
+
+  const sharedMedia = useMemo(
+    () =>
+      [...messages]
+        .filter((m) => m.media && m.media.mime.startsWith('image/'))
+        .reverse(),
+    [messages],
+  );
+  const sharedVoice = useMemo(
+    () =>
+      [...messages]
+        .filter((m) => m.media && m.media.mime.startsWith('audio/'))
+        .reverse(),
+    [messages],
+  );
+  const sharedFiles = useMemo(
+    () =>
+      [...messages]
+        .filter(
+          (m) =>
+            m.media &&
+            !m.media.mime.startsWith('image/') &&
+            !m.media.mime.startsWith('audio/'),
+        )
+        .reverse(),
+    [messages],
+  );
+  const sharedLinks = useMemo(() => extractLinks(messages), [messages]);
 
   const display = describeConversation(conversation, me?.id ?? null);
 
@@ -83,6 +187,8 @@ export const MembersPanel = ({ conversation, onClose }: MembersPanelProps) => {
     }
   };
 
+  const peerBio = peerProfile?.bio?.trim() || null;
+
   return (
     <aside className="members-panel">
       <div className="members-panel-header">
@@ -104,9 +210,6 @@ export const MembersPanel = ({ conversation, onClose }: MembersPanelProps) => {
           {isGroup
             ? `${conversation.members.length} members`
             : (() => {
-                const peer = conversation.members.find(
-                  (m) => m.userId !== me?.id,
-                );
                 if (!peer) return '';
                 const p = presence[peer.userId];
                 if (p?.status === PresenceStatus.Online) return 'online';
@@ -114,6 +217,126 @@ export const MembersPanel = ({ conversation, onClose }: MembersPanelProps) => {
               })()}
         </p>
       </div>
+
+      {!isGroup && peerBio && (
+        <div className="profile-bio-block">
+          <div className="profile-bio-label">Bio</div>
+          <p className="profile-bio-text">{peerBio}</p>
+        </div>
+      )}
+
+      {!isGroup && (
+        <div className="shared-section">
+          <div className="shared-tabs" role="tablist">
+            <button
+              role="tab"
+              aria-selected={activeTab === 'media'}
+              className={`shared-tab ${activeTab === 'media' ? 'is-active' : ''}`}
+              onClick={() => setActiveTab('media')}
+            >
+              <ImageIcon size={14} />
+              <span>Media</span>
+              <span className="shared-tab-count">{sharedMedia.length}</span>
+            </button>
+            <button
+              role="tab"
+              aria-selected={activeTab === 'voice'}
+              className={`shared-tab ${activeTab === 'voice' ? 'is-active' : ''}`}
+              onClick={() => setActiveTab('voice')}
+            >
+              <Mic size={14} />
+              <span>Voice</span>
+              <span className="shared-tab-count">{sharedVoice.length}</span>
+            </button>
+            <button
+              role="tab"
+              aria-selected={activeTab === 'files'}
+              className={`shared-tab ${activeTab === 'files' ? 'is-active' : ''}`}
+              onClick={() => setActiveTab('files')}
+            >
+              <FileIcon size={14} />
+              <span>Files</span>
+              <span className="shared-tab-count">{sharedFiles.length}</span>
+            </button>
+            <button
+              role="tab"
+              aria-selected={activeTab === 'links'}
+              className={`shared-tab ${activeTab === 'links' ? 'is-active' : ''}`}
+              onClick={() => setActiveTab('links')}
+            >
+              <LinkIcon size={14} />
+              <span>Links</span>
+              <span className="shared-tab-count">{sharedLinks.length}</span>
+            </button>
+          </div>
+
+          <div className="shared-panel">
+            {activeTab === 'media' &&
+              (sharedMedia.length === 0 ? (
+                <p className="shared-empty">No media yet</p>
+              ) : (
+                <div className="shared-media-grid">
+                  {sharedMedia.map((m) => (
+                    <div key={m.id} className="shared-media-cell">
+                      <MediaBubble media={m.media!} />
+                    </div>
+                  ))}
+                </div>
+              ))}
+
+            {activeTab === 'voice' &&
+              (sharedVoice.length === 0 ? (
+                <p className="shared-empty">No voice messages yet</p>
+              ) : (
+                <div className="shared-list">
+                  {sharedVoice.map((m) => (
+                    <div key={m.id} className="shared-list-item">
+                      <MediaBubble media={m.media!} />
+                    </div>
+                  ))}
+                </div>
+              ))}
+
+            {activeTab === 'files' &&
+              (sharedFiles.length === 0 ? (
+                <p className="shared-empty">No files yet</p>
+              ) : (
+                <div className="shared-list">
+                  {sharedFiles.map((m) => (
+                    <div key={m.id} className="shared-list-item">
+                      <MediaBubble media={m.media!} />
+                    </div>
+                  ))}
+                </div>
+              ))}
+
+            {activeTab === 'links' &&
+              (sharedLinks.length === 0 ? (
+                <p className="shared-empty">No links yet</p>
+              ) : (
+                <div className="shared-list">
+                  {sharedLinks.map((l, i) => (
+                    <a
+                      key={`${l.messageId}-${i}`}
+                      className="shared-link-item"
+                      href={l.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <LinkIcon size={14} className="shared-link-icon" />
+                      <div className="shared-link-body">
+                        <span className="shared-link-host">
+                          {safeHost(l.url)}
+                        </span>
+                        <span className="shared-link-url">{l.url}</span>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
 
       {isGroup && (
         <>
@@ -130,12 +353,20 @@ export const MembersPanel = ({ conversation, onClose }: MembersPanelProps) => {
                   <Avatar
                     seed={member.username}
                     avatarUrl={member.avatarUrl ?? null}
+                    accentColor={member.accentColor ?? null}
                     size={36}
                     showPresence
                     isOnline={online}
                   />
                   <div className="members-list-body">
-                    <p className="members-list-name">
+                    <p
+                      className="members-list-name"
+                      style={
+                        member.accentColor
+                          ? { color: member.accentColor }
+                          : undefined
+                      }
+                    >
                       {member.username}
                       {isMe && <span className="members-self-tag"> · you</span>}
                     </p>

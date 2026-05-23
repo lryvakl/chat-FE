@@ -34,7 +34,7 @@ export interface MessageHeader {
 
 const MAX_SKIPPED = 1000;
 
-const skippedKey = (dhPub: Uint8Array, n: number, b64: string): string =>
+const skippedKey = (_dhPub: Uint8Array, n: number, b64: string): string =>
   `${b64}:${n}`;
 
 const additionalData = (

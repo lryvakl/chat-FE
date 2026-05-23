@@ -231,9 +231,9 @@ export const getIdentityFingerprint = async (
 ): Promise<string> => {
   const s = await getSodium();
   const pub = await fromB64(vault.identity.publicKey);
-  const hash = s.crypto_generichash(16, pub);
-  const hex = Array.from(hash)
-    .map((b) => b.toString(16).padStart(2, '0'))
+  const hash = s.crypto_generichash(16, pub, null);
+  const hex = Array.from(hash as Uint8Array)
+    .map((b: number) => b.toString(16).padStart(2, '0'))
     .join('');
   return hex.match(/.{4}/g)?.join(' ') ?? hex;
 };

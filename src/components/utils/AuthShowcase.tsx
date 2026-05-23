@@ -60,7 +60,7 @@ export const AuthShowcase = () => {
           {t("header.title")}
         </h1>
         <p style={{ color: "rgba(255,255,255,0.85)", maxWidth: 360 }}>
-          Real-time messaging that's fast, private, and beautifully crafted.
+          {t("auth.showcaseTagline")}
         </p>
       </div>
 
@@ -75,18 +75,18 @@ export const AuthShowcase = () => {
       >
         <Feature
           icon={<Bolt size={20} />}
-          title="Real-time"
-          desc="Instant delivery powered by WebSockets — no refresh required."
+          title={t("auth.feature1Title")}
+          desc={t("auth.feature1Desc")}
         />
         <Feature
           icon={<Lock size={20} />}
-          title="Secure by default"
-          desc="JWT auth, encrypted transport, message-author verification."
+          title={t("auth.feature2Title")}
+          desc={t("auth.feature2Desc")}
         />
         <Feature
           icon={<Globe size={20} />}
-          title="Multi-language"
-          desc="Native UI in EN, UA, PL and JA — switch on the fly."
+          title={t("auth.feature3Title")}
+          desc={t("auth.feature3Desc")}
         />
       </div>
     </div>

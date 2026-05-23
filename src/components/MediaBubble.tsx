@@ -1,5 +1,6 @@
 import { Download, FileIcon, Loader2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { AudioPlayer } from './AudioPlayer';
 import { mediaApi } from '../api/mediaApi';
@@ -13,6 +14,7 @@ interface MediaBubbleProps {
 const blobCache = new Map<number, string>();
 
 export const MediaBubble = ({ media }: MediaBubbleProps) => {
+  const { t } = useTranslation();
   const [objectUrl, setObjectUrl] = useState<string | null>(
     () => blobCache.get(media.id) ?? null,
   );
@@ -41,13 +43,13 @@ export const MediaBubble = ({ media }: MediaBubbleProps) => {
         setObjectUrl(url);
       } catch (err) {
         console.error('Media decrypt failed:', err);
-        if (!aborted.current) setError('Failed to decrypt attachment');
+        if (!aborted.current) setError(t('media.decryptFailed'));
       }
     })();
     return () => {
       aborted.current = true;
     };
-  }, [media.id, media.key, media.nonce, media.mime]);
+  }, [media.id, media.key, media.nonce, media.mime, t]);
 
   const isImage = media.mime.startsWith('image/');
   const isAudio = media.mime.startsWith('audio/');
@@ -62,7 +64,7 @@ export const MediaBubble = ({ media }: MediaBubbleProps) => {
   if (!objectUrl) {
     return (
       <div className="msg-media-loading">
-        <Loader2 className="spin" size={16} /> Decrypting…
+        <Loader2 className="spin" size={16} /> {t('media.decrypting')}
       </div>
     );
   }

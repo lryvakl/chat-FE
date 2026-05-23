@@ -6,7 +6,6 @@ import { useNavigate, Link } from 'react-router-dom';
 
 import { AuroraBackground } from '../components/utils/AuroraBackground';
 import { AuthShowcase } from '../components/utils/AuthShowcase';
-import { LanguageSwitcher } from '../components/utils/LanguageSwitcher';
 import { ThemeToggle } from '../components/utils/ThemeToggle';
 import { TourButton } from '../components/utils/TourButton';
 import { getLoginSteps } from '../constants/steps';
@@ -69,7 +68,6 @@ const LoginPage = () => {
       >
         <ThemeToggle />
         <TourButton steps={loginSteps} />
-        <LanguageSwitcher />
       </div>
 
       <div
