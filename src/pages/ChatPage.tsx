@@ -1,10 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { usersApi } from '../api/usersApi';
 import { ChatHeader } from '../components/ChatHeader';
 import { CHAT_THEMES } from '../components/ChatSettingsModal';
+import {
+  getWallpaperBackground,
+  usePreferences,
+} from '../preferences/PreferencesContext';
 import { ConversationList } from '../components/ConversationList';
 import { MembersPanel } from '../components/MembersPanel';
 import MessageInput from '../components/MessageInput';
@@ -29,6 +35,7 @@ const ChatPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { id } = useParams();
+  const { t } = useTranslation();
   const conversationId = id ? Number(id) : null;
 
   useSocketLifecycle();
@@ -67,6 +74,21 @@ const ChatPage = () => {
   const [newChatOpen, setNewChatOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showJump, setShowJump] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { prefs } = usePreferences();
+
+  const onScrollMsgs = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+    setShowJump(distance > 240);
+  }, []);
+
+  const jumpToBottom = () => {
+    const el = scrollRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+  };
 
   const {
     messages,
@@ -153,8 +175,8 @@ const ChatPage = () => {
       .filter(
         ([uid, info]) => Number(uid) !== (me?.id ?? -1) && info.expiresAt > now,
       )
-      .map(([, info]) => info.username || 'Someone');
-  }, [typingMap, me?.id]);
+      .map(([, info]) => info.username || t('common.someone'));
+  }, [typingMap, me?.id, t]);
 
   const totalRecipients = useMemo(
     () => (conversation ? Math.max(0, conversation.members.length - 1) : 0),
@@ -205,14 +227,15 @@ const ChatPage = () => {
         style={
           conversation
             ? {
-                background: conversation.wallpaperUrl
-                  ? `url(${conversation.wallpaperUrl}) center/cover no-repeat`
-                  : conversation.theme
-                    ? (CHAT_THEMES.find((t) => t.id === conversation.theme)
-                        ?.gradient ?? undefined)
-                    : undefined,
+                background:
+                  conversation.wallpaperUrl
+                    ? `url(${conversation.wallpaperUrl}) center/cover no-repeat`
+                    : conversation.theme
+                      ? (CHAT_THEMES.find((t) => t.id === conversation.theme)
+                          ?.gradient ?? undefined)
+                      : getWallpaperBackground(prefs.wallpaper),
               }
-            : undefined
+            : { background: getWallpaperBackground(prefs.wallpaper) }
         }
       >
         {!conversation ? (
@@ -220,19 +243,19 @@ const ChatPage = () => {
             <button
               className="icon-btn mobile-only"
               onClick={() => setDrawerOpen(true)}
-              aria-label="Open sidebar"
+              aria-label={t('chat.openSidebar')}
               style={{ position: 'absolute', top: 16, left: 16 }}
             >
               ☰
             </button>
             <div className="empty-chat-body">
-              <h2>Select a chat</h2>
-              <p>Pick a conversation from the list or start a new one.</p>
+              <h2>{t('chat.selectChat')}</h2>
+              <p>{t('chat.selectChatHint')}</p>
               <button
                 className="primary-btn"
                 onClick={() => setNewChatOpen(true)}
               >
-                New chat
+                {t('chat.newChat')}
               </button>
             </div>
           </div>
@@ -244,9 +267,19 @@ const ChatPage = () => {
               onOpenMenu={() => setDrawerOpen(true)}
             />
 
-            <div className="msg-scroll">
+            <div className="msg-scroll" ref={scrollRef} onScroll={onScrollMsgs}>
+              {showJump && (
+                <button
+                  className="jump-to-bottom"
+                  onClick={jumpToBottom}
+                  aria-label={t('chat.scrollToLatest')}
+                  title={t('chat.scrollToLatest')}
+                >
+                  <ChevronDown size={18} />
+                </button>
+              )}
               {isLoadingHistory && messages.length === 0 ? (
-                <Loader fullScreen={false} message="Loading messages…" />
+                <Loader fullScreen={false} message={t('chat.loadingMessages')} />
               ) : (
                 <MessageList
                   messages={messages}

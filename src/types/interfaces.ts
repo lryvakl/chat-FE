@@ -33,6 +33,7 @@ export interface AuthState {
   token: string | null;
   isLoading: boolean;
   error: string | null;
+  recoveryNeeded: boolean;
 }
 
 export interface ConversationMemberSummary {
@@ -42,6 +43,7 @@ export interface ConversationMemberSummary {
   displayName?: string | null;
   avatarUrl?: string | null;
   customStatus?: string | null;
+  accentColor?: string | null;
 }
 
 export interface LastMessagePreview {

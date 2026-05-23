@@ -201,7 +201,7 @@ const normalizeIncoming = async (
       isAwaitingDistribution &&
       isGroupConversation(raw.conversationId)
     ) {
-      if (shouldResetPeer(raw.senderId)) {
+      if (raw.senderId != null && shouldResetPeer(raw.senderId)) {
         chatClient.requestSessionReset(socketService.rawSocket, raw.senderId);
       }
     }

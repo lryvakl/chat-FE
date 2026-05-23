@@ -55,6 +55,11 @@ export const MessageList = ({
     for (const m of members) map.set(m.userId, m.avatarUrl ?? null);
     return map;
   }, [members]);
+  const accentByUserId = useMemo(() => {
+    const map = new Map<number, string | null>();
+    for (const m of members) map.set(m.userId, m.accentColor ?? null);
+    return map;
+  }, [members]);
   const endRef = useRef<HTMLDivElement>(null);
   const { t, i18n } = useTranslation();
   const [pickerForId, setPickerForId] = useState<number | null>(null);
@@ -74,8 +79,8 @@ export const MessageList = ({
         onClick={() =>
           setPickerForId((cur) => (cur === msg.id ? null : msg.id))
         }
-        aria-label="React"
-        title="React"
+        aria-label={t('common.react')}
+        title={t('common.react')}
       >
         <Smile size={14} />
       </button>
@@ -83,8 +88,8 @@ export const MessageList = ({
         <button
           className="icon-btn"
           onClick={() => onReply(msg)}
-          aria-label="Reply"
-          title="Reply"
+          aria-label={t('common.reply')}
+          title={t('common.reply')}
         >
           <CornerUpLeft size={14} />
         </button>
@@ -94,16 +99,16 @@ export const MessageList = ({
           <button
             className="icon-btn"
             onClick={() => onEdit(msg)}
-            aria-label="Edit"
-            title="Edit"
+            aria-label={t('common.edit')}
+            title={t('common.edit')}
           >
             <Pencil size={14} />
           </button>
           <button
             className="icon-btn danger"
             onClick={() => onDelete(msg.id)}
-            aria-label="Delete"
-            title="Delete"
+            aria-label={t('common.delete')}
+            title={t('common.delete')}
           >
             <Trash2 size={14} />
           </button>
@@ -117,7 +122,12 @@ export const MessageList = ({
       {items.map((msg, index) => {
         const isMe = msg.senderId === currentUserId;
         const prev = items[index - 1];
-        const senderName = msg.senderUsername ?? 'Unknown';
+        const senderName = msg.senderUsername ?? t('common.unknown');
+        const senderAccent =
+          msg.senderId !== null
+            ? (accentByUserId.get(msg.senderId) ?? null)
+            : null;
+        const senderColor = senderAccent ?? stringToColor(senderName);
 
         const showDate = !prev || !isSameDay(msg.createdAt, prev.createdAt);
         const showAvatar =
@@ -149,7 +159,7 @@ export const MessageList = ({
                   fontSize: '0.73rem',
                   fontWeight: 700,
                   marginBottom: '0.25rem',
-                  color: stringToColor(senderName),
+                  color: senderColor,
                 }}
               >
                 {senderName}
@@ -158,12 +168,12 @@ export const MessageList = ({
             {msg.replyTo && (
               <div className="msg-reply-quote">
                 <span className="msg-reply-quote-name">
-                  {msg.replyTo.senderUsername ?? 'Unknown'}
+                  {msg.replyTo.senderUsername ?? t('common.unknown')}
                 </span>
                 <span className="msg-reply-quote-text">
                   {msg.replyTo.isEncrypted && !msg.replyTo.text
-                    ? '[encrypted message]'
-                    : msg.replyTo.text || '[media]'}
+                    ? t('chat.encryptedMessage')
+                    : msg.replyTo.text || t('chat.mediaPlaceholder')}
                 </span>
               </div>
             )}
@@ -182,7 +192,7 @@ export const MessageList = ({
               </p>
             )}
             <div className="msg-meta">
-              {msg.editedAt && <span className="msg-edited">edited</span>}
+              {msg.editedAt && <span className="msg-edited">{t('chat.edited')}</span>}
               <span className="msg-time">{formatTime(msg.createdAt)}</span>
               {isMe &&
                 (allRead ? (
@@ -205,7 +215,7 @@ export const MessageList = ({
                       type="button"
                       className={clsx('msg-reaction-chip', mine && 'mine')}
                       onClick={() => onToggleReaction?.(msg, r.emoji)}
-                      title={mine ? 'Remove reaction' : 'Add reaction'}
+                      title={mine ? t('chat.removeReaction') : t('chat.addReaction')}
                     >
                       <span>{r.emoji}</span>
                       <span className="msg-reaction-count">{r.count}</span>
@@ -258,6 +268,7 @@ export const MessageList = ({
                           ? (avatarByUserId.get(msg.senderId) ?? null)
                           : null
                       }
+                      accentColor={senderAccent}
                       size={36}
                     />
                   )}

@@ -1,15 +1,18 @@
+import { useTranslation } from 'react-i18next';
+
 interface TypingIndicatorProps {
   usernames: string[];
 }
 
 export const TypingIndicator = ({ usernames }: TypingIndicatorProps) => {
+  const { t } = useTranslation();
   if (usernames.length === 0) return null;
   const label =
     usernames.length === 1
-      ? `${usernames[0]} is typing`
+      ? t('chat.isTypingLabel', { name: usernames[0] })
       : usernames.length === 2
-        ? `${usernames[0]} and ${usernames[1]} are typing`
-        : `${usernames.length} people are typing`;
+        ? t('chat.twoTypingLabel', { a: usernames[0], b: usernames[1] })
+        : t('chat.peopleTypingLabel', { count: usernames.length });
   return (
     <div className="typing-indicator">
       <span className="typing-dot" />

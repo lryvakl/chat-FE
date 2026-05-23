@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { Search, Users, User as UserIcon, X, Check } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Avatar } from './Avatar';
@@ -18,6 +19,7 @@ interface NewChatModalProps {
 export const NewChatModal = ({ onClose }: NewChatModalProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const me = useSelector((s: RootState) => s.auth.user);
+  const { t } = useTranslation();
 
   const [tab, setTab] = useState<Tab>('dm');
   const [query, setQuery] = useState('');
@@ -96,8 +98,12 @@ export const NewChatModal = ({ onClose }: NewChatModalProps) => {
         aria-modal="true"
       >
         <header className="modal-header">
-          <h3>New chat</h3>
-          <button className="icon-btn" onClick={onClose} aria-label="Close">
+          <h3>{t('newChat.title')}</h3>
+          <button
+            className="icon-btn"
+            onClick={onClose}
+            aria-label={t('common.close')}
+          >
             <X size={18} />
           </button>
         </header>
@@ -107,20 +113,20 @@ export const NewChatModal = ({ onClose }: NewChatModalProps) => {
             className={clsx('modal-tab', tab === 'dm' && 'active')}
             onClick={() => setTab('dm')}
           >
-            <UserIcon size={15} /> Direct
+            <UserIcon size={15} /> {t('newChat.tabDirect')}
           </button>
           <button
             className={clsx('modal-tab', tab === 'group' && 'active')}
             onClick={() => setTab('group')}
           >
-            <Users size={15} /> Group
+            <Users size={15} /> {t('newChat.tabGroup')}
           </button>
         </div>
 
         {tab === 'group' && (
           <input
             className="modal-input"
-            placeholder="Group name"
+            placeholder={t('newChat.groupNamePlaceholder')}
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
             maxLength={120}
@@ -132,7 +138,7 @@ export const NewChatModal = ({ onClose }: NewChatModalProps) => {
           <input
             ref={inputRef}
             className="modal-input modal-input-search"
-            placeholder="Search users…"
+            placeholder={t('newChat.searchUsersPlaceholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -146,7 +152,7 @@ export const NewChatModal = ({ onClose }: NewChatModalProps) => {
                 <button
                   className="modal-chip-x"
                   onClick={() => toggleGroupSelect(u)}
-                  aria-label={`Remove ${u.username}`}
+                  aria-label={t('newChat.removeUser', { name: u.username })}
                 >
                   <X size={12} />
                 </button>
@@ -157,10 +163,10 @@ export const NewChatModal = ({ onClose }: NewChatModalProps) => {
 
         <div className="modal-results">
           {results.length === 0 && query.trim() && (
-            <p className="modal-empty">No users found</p>
+            <p className="modal-empty">{t('newChat.noUsersFound')}</p>
           )}
           {results.length === 0 && !query.trim() && (
-            <p className="modal-empty">Start typing to find users</p>
+            <p className="modal-empty">{t('newChat.startTyping')}</p>
           )}
           {results
             .filter((u) => u.id !== me?.id)
@@ -197,7 +203,7 @@ export const NewChatModal = ({ onClose }: NewChatModalProps) => {
               }
               onClick={handleCreateGroup}
             >
-              Create group ({selectedList.length})
+              {t('newChat.createGroup', { count: selectedList.length })}
             </button>
           </footer>
         )}

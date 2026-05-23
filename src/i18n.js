@@ -3,6 +3,7 @@ import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
 import translationUK from "./config/locales/uk/translation.json";
+import translationEN from "./config/locales/en/translation.json";
 import translationPL from "./config/locales/pl/translation.json";
 import translationJA from "./config/locales/ja/translation.json";
 
@@ -13,6 +14,9 @@ i18n
     resources: {
       uk: {
         translation: translationUK,
+      },
+      en: {
+        translation: translationEN,
       },
       pl: {
         translation: translationPL,

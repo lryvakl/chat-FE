@@ -1,7 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { authApi } from '../../api/authApi';
-import { ensureIdentityProvisioned } from '../../crypto/provisioning';
+import {
+  ensureIdentityProvisioned,
+  VaultMissingError,
+} from '../../crypto/provisioning';
 import type { AuthCredentials } from '../../types/interfaces';
 
 export const loginUser = createAsyncThunk(
@@ -10,6 +13,7 @@ export const loginUser = createAsyncThunk(
     try {
       const response = await authApi.login(credentials);
       localStorage.setItem('token', response.accessToken);
+      let recoveryNeeded = false;
       try {
         await ensureIdentityProvisioned(
           response.user.id,
@@ -18,9 +22,13 @@ export const loginUser = createAsyncThunk(
           response.accessToken,
         );
       } catch (cryptoErr) {
-        console.error('Crypto provisioning failed:', cryptoErr);
+        if (cryptoErr instanceof VaultMissingError) {
+          recoveryNeeded = true;
+        } else {
+          console.error('Crypto provisioning failed:', cryptoErr);
+        }
       }
-      return response;
+      return { ...response, recoveryNeeded };
     } catch (error: unknown) {
       if (error instanceof Error) {
         return rejectWithValue(error.message || 'Login failed');
