@@ -8,6 +8,7 @@ import App from "./App.tsx";
 import { store, persistor } from "./store/index.ts";
 import { setupAxiosInterceptors } from "./api/axios.instance.ts";
 import { AppThemeProvider } from "./theme/ThemeContext.tsx";
+import { PreferencesProvider } from "./preferences/PreferencesContext.tsx";
 import "./i18n";
 import "./index.css";
 
@@ -18,9 +19,11 @@ createRoot(document.getElementById("root")!).render(
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <AppThemeProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
+          <PreferencesProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </PreferencesProvider>
         </AppThemeProvider>
       </PersistGate>
     </Provider>

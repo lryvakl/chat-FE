@@ -10,7 +10,7 @@ const LANGUAGES = [
 ] as const;
 
 export const LanguageSwitcher = () => {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
 
   return (
     <DropdownMenu.Root>
@@ -18,7 +18,7 @@ export const LanguageSwitcher = () => {
         <button
           id="language-switcher"
           className="icon-btn"
-          aria-label="Change language"
+          aria-label={t("language.changeLanguage")}
         >
           <Globe size={18} />
         </button>

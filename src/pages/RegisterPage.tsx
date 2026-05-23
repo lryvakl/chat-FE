@@ -6,13 +6,12 @@ import { useNavigate, Link } from "react-router-dom";
 
 import { AuroraBackground } from "../components/utils/AuroraBackground";
 import { AuthShowcase } from "../components/utils/AuthShowcase";
-import { LanguageSwitcher } from "../components/utils/LanguageSwitcher";
 import { ThemeToggle } from "../components/utils/ThemeToggle";
 import { TourButton } from "../components/utils/TourButton";
 import { getRegisterSteps } from "../constants/steps";
 import type { AppDispatch, RootState } from "../store";
 import { registerUser } from "../store/thunks/register";
-import { PATHS, Room } from "../types/enums";
+import { PATHS } from "../types/enums";
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
@@ -27,7 +26,7 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (token) navigate(`${PATHS.CHAT}/${Room.General}`);
+    if (token) navigate(PATHS.CHAT);
   }, [token, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -62,7 +61,6 @@ const RegisterPage = () => {
       >
         <ThemeToggle />
         <TourButton steps={registerSteps} />
-        <LanguageSwitcher />
       </div>
 
       <div
