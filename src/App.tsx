@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 
+import { RecoveryGate } from './components/RecoveryGate';
 import ChatPage from './pages/ChatPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -10,7 +11,16 @@ import { PATHS } from './types/enums';
 
 const ProtectedRoute = () => {
   const token = useSelector((s: RootState) => s.auth.token);
-  return token ? <Outlet /> : <Navigate to={PATHS.LOGIN} replace />;
+  const recoveryNeeded = useSelector(
+    (s: RootState) => s.auth.recoveryNeeded,
+  );
+  if (!token) return <Navigate to={PATHS.LOGIN} replace />;
+  return (
+    <>
+      <Outlet />
+      {recoveryNeeded && <RecoveryGate />}
+    </>
+  );
 };
 
 const GuestRoute = () => {

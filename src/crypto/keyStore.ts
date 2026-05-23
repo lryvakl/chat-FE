@@ -281,6 +281,71 @@ export const destroyVault = async (): Promise<void> => {
   await database.delete(STORE, VAULT_KEY);
 };
 
+export interface VaultBackup {
+  format: 'chat-vault-backup';
+  version: 1;
+  exportedAt: string;
+  vault: StoredVault;
+}
+
+export const exportVaultBlob = async (
+  userId: number,
+): Promise<VaultBackup> => {
+  const database = await db();
+  const raw = (await database.get(STORE, VAULT_KEY)) as StoredVault | undefined;
+  if (!raw || raw.userId !== userId) {
+    throw new Error('No vault to export for this user');
+  }
+  return {
+    format: 'chat-vault-backup',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    vault: raw,
+  };
+};
+
+const isStoredVault = (v: unknown): v is StoredVault => {
+  if (!v || typeof v !== 'object') return false;
+  const r = v as Record<string, unknown>;
+  return (
+    r.version === 1 &&
+    typeof r.userId === 'number' &&
+    typeof r.username === 'string' &&
+    typeof r.kdfSalt === 'string' &&
+    typeof r.kdfOps === 'number' &&
+    typeof r.kdfMem === 'number' &&
+    typeof r.ciphertext === 'string' &&
+    typeof r.nonce === 'string'
+  );
+};
+
+export const importVaultBlob = async (
+  userId: number,
+  backup: unknown,
+): Promise<void> => {
+  if (
+    !backup ||
+    typeof backup !== 'object' ||
+    (backup as { format?: unknown }).format !== 'chat-vault-backup'
+  ) {
+    throw new Error('Not a valid chat-vault-backup file');
+  }
+  const b = backup as { vault?: unknown };
+  if (!isStoredVault(b.vault)) {
+    throw new Error('Backup is missing or has malformed vault payload');
+  }
+  if (b.vault.userId !== userId) {
+    throw new Error(
+      `Backup belongs to user #${b.vault.userId}, not the current account`,
+    );
+  }
+  const database = await db();
+  await database.put(STORE, b.vault, VAULT_KEY);
+  cached = null;
+  cachedUserId = null;
+  cachedKek = null;
+};
+
 export { concat };
 
 export const requireVault = (): VaultPlaintext => {

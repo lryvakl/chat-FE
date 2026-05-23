@@ -22,6 +22,16 @@ export class MissingIdentityError extends Error {
   }
 }
 
+export class VaultMissingError extends Error {
+  constructor() {
+    super(
+      'Local vault is missing but the server still holds an identity. ' +
+        'Restore from an exported backup or perform a fresh reset.',
+    );
+    this.name = 'VaultMissingError';
+  }
+}
+
 const republishFromVault = async (token: string): Promise<void> => {
   const v = requireVault();
   const payload: UploadBundlePayload = {
@@ -86,10 +96,7 @@ export const ensureIdentityProvisioned = async (
   } else {
     const counts = await keysApi.me(token);
     if (counts.hasIdentity) {
-      console.warn(
-        'Local vault missing; performing fresh identity reset (old encrypted history will become unreadable).',
-      );
-      await resetAndReprovision(userId, username, password, token);
+      throw new VaultMissingError();
     } else {
       await provisionNewIdentity(userId, username, password, token);
     }
@@ -100,6 +107,32 @@ export const ensureIdentityProvisioned = async (
     counts.hasIdentity &&
     counts.oneTimePreKeyCount < ONE_TIME_LOW_THRESHOLD
   ) {
+    const fresh = await replenishOneTimePreKeys(ONE_TIME_REPLENISH_BATCH);
+    await keysApi.replenish(fresh, token);
+    await persistVault();
+  }
+};
+
+export const finishFreshReset = async (
+  userId: number,
+  username: string,
+  password: string,
+  token: string,
+): Promise<void> => {
+  await resetAndReprovision(userId, username, password, token);
+};
+
+export const finishRestoreFromBackup = async (
+  userId: number,
+  password: string,
+  token: string,
+): Promise<void> => {
+  await unlockVault(userId, password);
+  const counts = await keysApi.me(token);
+  if (!counts.hasIdentity) {
+    await republishFromVault(token);
+  }
+  if (counts.oneTimePreKeyCount < ONE_TIME_LOW_THRESHOLD) {
     const fresh = await replenishOneTimePreKeys(ONE_TIME_REPLENISH_BATCH);
     await keysApi.replenish(fresh, token);
     await persistVault();

@@ -130,7 +130,31 @@
     "presetWorking": "💼 Working",
     "presetDnd": "🌙 Do not disturb",
     "presetTraveling": "✈️ Traveling",
-    "presetGaming": "🎮 Gaming"
+    "presetGaming": "🎮 Gaming",
+    "backupSection": "Encryption key backup",
+    "backupHint": "Download an encrypted copy of your local key vault. Store the file safely — without it you cannot read old messages if you clear browser storage or switch device.",
+    "exportBackup": "Export backup"
+  },
+  "recovery": {
+    "title": "Recover encryption keys",
+    "warning": "Your local key vault is missing but the server still holds your identity. Restore from a backup file you saved earlier, or perform a fresh reset (old encrypted messages will become unreadable).",
+    "tabs": {
+      "restore": "Restore from backup",
+      "reset": "Fresh reset"
+    },
+    "restoreHint": "Pick a chat-vault-*.json file you exported from Profile → Encryption key backup. You will need the account password that was active when the backup was made.",
+    "resetHint": "This clears the server-side identity and generates a new one. All previously sent encrypted messages will become permanently unreadable.",
+    "backupFile": "Backup file",
+    "password": "Password",
+    "passwordPlaceholder": "Your account password",
+    "confirmReset": "I understand, reset",
+    "working": "Working…",
+    "logoutInstead": "Log out instead",
+    "errors": {
+      "noFile": "Pick a backup file first.",
+      "noPassword": "Enter your password.",
+      "badJson": "Selected file is not valid JSON."
+    }
   },
   "appearance": {
     "title": "Appearance",

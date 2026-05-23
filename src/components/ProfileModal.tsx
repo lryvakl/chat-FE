@@ -1,4 +1,4 @@
-import { Camera, Check, X } from 'lucide-react';
+import { Camera, Check, Download, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Avatar } from './Avatar';
 import { usersApi, type UpdateProfilePayload } from '../api/usersApi';
+import { exportVaultBlob } from '../crypto/keyStore';
 import type { AppDispatch, RootState } from '../store';
 import { profileUpdated } from '../store/authSlice';
 
@@ -49,6 +50,7 @@ export const ProfileModal = ({ onClose }: ProfileModalProps) => {
   );
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -128,6 +130,29 @@ export const ProfileModal = ({ onClose }: ProfileModalProps) => {
   };
 
   const avatarSeed = username || me?.username || '?';
+
+  const handleExportBackup = async () => {
+    if (!me) return;
+    setExportError(null);
+    try {
+      const backup = await exportVaultBlob(me.id);
+      const blob = new Blob([JSON.stringify(backup, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const stamp = new Date().toISOString().slice(0, 10);
+      a.download = `chat-vault-${me.username}-${stamp}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setExportError(msg);
+    }
+  };
 
   return createPortal(
     <div className="modal-overlay" onClick={onClose}>
@@ -262,6 +287,37 @@ export const ProfileModal = ({ onClose }: ProfileModalProps) => {
               aria-hidden="true"
             />
           </button>
+
+          <div className="settings-section-title" style={{ marginTop: 20 }}>
+            {t('profile.backupSection')}
+          </div>
+          <p
+            style={{
+              color: 'var(--text-muted)',
+              fontSize: '0.82rem',
+              margin: '0 0 0.6rem',
+            }}
+          >
+            {t('profile.backupHint')}
+          </p>
+          <button
+            type="button"
+            className="ghost-btn"
+            onClick={() => void handleExportBackup()}
+            style={{ width: '100%', justifyContent: 'center' }}
+          >
+            <Download size={14} style={{ marginRight: 6 }} />
+            {t('profile.exportBackup')}
+          </button>
+          {exportError && (
+            <div
+              className="alert-error"
+              style={{ marginTop: '0.5rem' }}
+              role="alert"
+            >
+              {exportError}
+            </div>
+          )}
         </div>
 
         <footer className="modal-footer modal-footer-row">

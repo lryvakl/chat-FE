@@ -11,6 +11,7 @@ const initialState: AuthState = {
   token: null,
   isLoading: false,
   error: null,
+  recoveryNeeded: false,
 };
 
 const authSlice = createSlice({
@@ -28,16 +29,25 @@ const authSlice = createSlice({
       if (!state.user) return;
       state.user = { ...state.user, ...action.payload };
     },
+    recoveryResolved: (state) => {
+      state.recoveryNeeded = false;
+    },
   },
   extraReducers: (builder) => {
     builder
       .addMatcher(
         isAnyOf(registerUser.fulfilled, loginUser.fulfilled),
-        (state, action: PayloadAction<AuthResponse | undefined>) => {
+        (
+          state,
+          action: PayloadAction<
+            (AuthResponse & { recoveryNeeded?: boolean }) | undefined
+          >,
+        ) => {
           if (action.payload) {
             state.isLoading = false;
             state.token = action.payload.accessToken;
             state.user = action.payload.user;
+            state.recoveryNeeded = Boolean(action.payload.recoveryNeeded);
           }
         },
       )
@@ -55,5 +65,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearError, profileUpdated } = authSlice.actions;
+export const { logout, clearError, profileUpdated, recoveryResolved } =
+  authSlice.actions;
 export default authSlice.reducer;

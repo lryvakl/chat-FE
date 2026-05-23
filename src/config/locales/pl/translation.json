@@ -130,7 +130,31 @@
     "presetWorking": "💼 Pracuję",
     "presetDnd": "🌙 Nie przeszkadzać",
     "presetTraveling": "✈️ W podróży",
-    "presetGaming": "🎮 Gram"
+    "presetGaming": "🎮 Gram",
+    "backupSection": "Kopia zapasowa kluczy",
+    "backupHint": "Pobierz zaszyfrowaną kopię lokalnego magazynu kluczy. Przechowuj plik bezpiecznie — bez niego nie odczytasz starych wiadomości po wyczyszczeniu pamięci przeglądarki lub zmianie urządzenia.",
+    "exportBackup": "Eksportuj kopię"
+  },
+  "recovery": {
+    "title": "Odzyskiwanie kluczy szyfrowania",
+    "warning": "Lokalny magazyn kluczy zaginął, ale serwer wciąż przechowuje twoją tożsamość. Przywróć z wcześniej wyeksportowanej kopii lub wykonaj pełny reset (stare zaszyfrowane wiadomości staną się nieczytelne).",
+    "tabs": {
+      "restore": "Przywróć z kopii",
+      "reset": "Pełny reset"
+    },
+    "restoreHint": "Wybierz plik chat-vault-*.json wyeksportowany w Profil → Kopia zapasowa kluczy. Wymagane będzie hasło konta z momentu tworzenia kopii.",
+    "resetHint": "Spowoduje to skasowanie tożsamości po stronie serwera i wygenerowanie nowej. Wszystkie wcześniej wysłane zaszyfrowane wiadomości staną się trwale nieczytelne.",
+    "backupFile": "Plik kopii",
+    "password": "Hasło",
+    "passwordPlaceholder": "Hasło konta",
+    "confirmReset": "Rozumiem, resetuj",
+    "working": "Przetwarzanie…",
+    "logoutInstead": "Wyloguj się",
+    "errors": {
+      "noFile": "Najpierw wybierz plik kopii.",
+      "noPassword": "Wprowadź hasło.",
+      "badJson": "Wybrany plik nie jest poprawnym JSON."
+    }
   },
   "appearance": {
     "title": "Wygląd",
